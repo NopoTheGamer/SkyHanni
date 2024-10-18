@@ -28,14 +28,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+//#if FORGE
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 
 @Mod(
     modid = SkyHanniMod.MODID,
@@ -44,12 +44,25 @@ import org.apache.logging.log4j.Logger
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
     version = "@MOD_VERSION@",
 )
+//#endif
 class SkyHanniMod {
 
+    //#if FORGE
     @Mod.EventHandler
-    fun preInit(event: FMLPreInitializationEvent?) {
-        checkIfNeuIsLoaded()
+    fun onPreInitForge(event: FMLPreInitializationEvent?) {
+        onPreInit()
+    }
 
+    @Mod.EventHandler
+    fun onInitForge(event: FMLInitializationEvent?) {
+        onInit()
+    }
+    //#endif
+
+    fun onPreInit() {
+        //#if FORGE
+        checkIfNeuIsLoaded()
+        //#endif
         HotswapSupport.load()
 
         loadModule(this)
@@ -64,8 +77,7 @@ class SkyHanniMod {
         PreInitFinishedEvent.post()
     }
 
-    @Mod.EventHandler
-    fun init(event: FMLInitializationEvent?) {
+    fun onInit() {
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
@@ -87,7 +99,9 @@ class SkyHanniMod {
     fun loadModule(obj: Any) {
         if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
         modules.add(obj)
+        //#if FORGE
         MinecraftForge.EVENT_BUS.register(obj)
+        //#endif
     }
 
     @HandleEvent
@@ -95,7 +109,7 @@ class SkyHanniMod {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
-                Minecraft.getMinecraft().thePlayer.closeScreen()
+                Minecraft.getMinecraft().thePlayer?.closeScreen()
                 OtherInventoryData.close()
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
                 screenTicks = 0
@@ -109,8 +123,7 @@ class SkyHanniMod {
         const val MODID = "skyhanni"
 
         @JvmStatic
-        val version: String
-            get() = Loader.instance().indexedModList[MODID]!!.version
+        val version: String get() = "@MOD_VERSION@"
 
         @JvmField
         var feature: Features = Features()
