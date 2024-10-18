@@ -117,12 +117,12 @@ class SkyHanniMod {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (screenToOpen != null) {
+        screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
                 Minecraft.getMinecraft().thePlayer?.closeScreen()
                 OtherInventoryData.close()
-                Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
+                Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
             }
