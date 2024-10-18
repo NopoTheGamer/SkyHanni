@@ -331,7 +331,8 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
 
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
+    vars.put("FORGE", if (target.isForge) 1 else 0)
+    vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
