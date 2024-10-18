@@ -152,6 +152,9 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
+    } else {
+        modImplementation("net.fabricmc:fabric-loader:0.16.7")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.83.0+1.20")
     }
 
     implementation(kotlin("stdlib-jdk8"))
