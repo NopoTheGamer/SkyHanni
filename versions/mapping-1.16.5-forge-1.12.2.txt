@@ -65,6 +65,7 @@ net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resour
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
+net.minecraft.client.Minecraft submit() addScheduledTask()
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
