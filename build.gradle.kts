@@ -152,9 +152,9 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
-    } else {
+    } else if (target == ProjectTarget.MODERN)  {
         modImplementation("net.fabricmc:fabric-loader:0.16.7")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.83.0+1.20")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -162,7 +162,8 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
@@ -252,6 +253,10 @@ if (target == ProjectTarget.MAIN) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
 if (target.parent == ProjectTarget.MAIN) {
