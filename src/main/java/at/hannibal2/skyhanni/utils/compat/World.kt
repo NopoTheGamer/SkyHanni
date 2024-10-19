@@ -36,11 +36,12 @@ fun Minecraft.isOnMainThread() =
 //$$ this.isSameThread
 //#endif
 
+//#if FORGE
 fun IChatComponent.getFormattedTextCompat() =
-//#if MC < 1.16
+
     this.formattedText
-//#else
-//$$     run {
+
+/*//$$     run {
 //$$         val sb = StringBuilder()
 //$$         for (component in iterator()) {
 //$$             sb.append(component.style.formattingCode)
@@ -49,15 +50,14 @@ fun IChatComponent.getFormattedTextCompat() =
 //$$         }
 //$$         sb.toString()
 //$$     }
-//#endif
+////////#endif */
 
 object Effects {
     val invisibility =
-        //#if MC <1.12
+
         Potion.invisibility
-    //#else
-    //$$    net.minecraft.init.PotionTypes.INVISIBILITY
-    //#endif
+
 }
+//#endif
 
 

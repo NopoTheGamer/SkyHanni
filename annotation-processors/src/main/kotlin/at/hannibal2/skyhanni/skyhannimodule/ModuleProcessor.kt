@@ -13,6 +13,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
 import java.io.OutputStreamWriter
+import kotlin.io.path.Path
+import kotlin.io.path.createFile
+import kotlin.io.path.exists
 
 class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logger: KSPLogger) : SymbolProcessor {
 
@@ -27,6 +30,26 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
         minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
             ?.asStarProjectedType()
+
+        val exceptions = listOf("SkyHanniMod", "HandleEvent", "IslandType")
+
+        resolver.getAllFiles().forEach {
+            var path = it.filePath
+            for (exception in exceptions) {
+                if (path.contains(exception)) {
+                    return@forEach
+                }
+            }
+            path = path.replace("src/main/", "versions/1.16.5/src/main/")
+            //logger.warn(path)
+            val file3 = Path(path)
+
+            file3.parent?.toFile()?.mkdirs()
+
+            if (!file3.exists()) {
+               // file3.createFile()
+            }
+        }
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
@@ -98,7 +121,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
             it.write("object LoadedModules {\n")
-            it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
+
             it.write("    val modules: List<Any> = buildList {\n")
 
             symbols.forEach { symbol ->

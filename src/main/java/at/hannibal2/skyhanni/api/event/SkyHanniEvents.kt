@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if FORGE
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+//#endif
 import java.lang.reflect.Method
 
 @SkyHanniModule
@@ -46,6 +48,7 @@ object SkyHanniEvents {
             .addListener(method, instance, options)
     }
 
+    //#if FORGE
     @HandleEvent
     fun onRepoLoad(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
@@ -65,6 +68,8 @@ object SkyHanniEvents {
                 }
         }
     }
+
+    //#endif
 
     /**
      * Returns a list of all super classes and the class itself up to [SkyHanniEvent].

@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni
 
+
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
+import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
+//#if FORGE
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
@@ -13,14 +18,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+//#endif
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -67,28 +71,33 @@ class SkyHanniMod {
     //$$ override fun onInitialize() {
     //$$     onPreInit()
     //$$     onInit()
+    //$$     println("SkyHanni initialized")
     //$$ }
     //#endif
 
     fun onPreInit() {
         //#if FORGE
         checkIfNeuIsLoaded()
-        //#endif
+
         HotswapSupport.load()
+        //#endif
 
         loadModule(this)
         LoadedModules.modules.forEach { loadModule(it) }
+        SkyHanniEvents.init(modules)
+        //#if FORGE
 
         loadModule(CrimsonIsleReputationHelper(this))
 
-        SkyHanniEvents.init(modules)
 
         CommandRegistrationEvent.post()
 
         PreInitFinishedEvent.post()
+        //#endif
     }
 
     fun onInit() {
+        //#if FORGE
         configManager = ConfigManager()
         configManager.firstLoad()
         initLogging()
@@ -103,6 +112,7 @@ class SkyHanniMod {
             Exception("Error reading repo data", e).printStackTrace()
         }
         loadedClasses.clear()
+        //#endif
     }
 
     private val loadedClasses = mutableSetOf<String>()
@@ -117,6 +127,8 @@ class SkyHanniMod {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        //println("Skyhanni Tick Event!!")
+        //#if FORGE
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
@@ -127,6 +139,12 @@ class SkyHanniMod {
                 screenToOpen = null
             }
         }
+        //#endif
+    }
+
+    @HandleEvent
+    fun onWorld(event: WorldChangeEvent) {
+        println("World Change Event!!")
     }
 
     companion object {
@@ -136,22 +154,23 @@ class SkyHanniMod {
         @JvmStatic
         val version: String get() = "@MOD_VERSION@"
 
+        val modules: MutableList<Any> = ArrayList()
+        //#if FORGE
         @JvmField
         var feature: Features = Features()
         lateinit var sackData: SackData
         lateinit var friendsData: FriendsJson
         lateinit var knownFeaturesData: KnownFeaturesJson
         lateinit var jacobContestsData: JacobContestsJson
-        lateinit var visualWordsData: VisualWordsJson
 
+        lateinit var visualWordsData: VisualWordsJson
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
+
         fun getLogger(name: String): Logger {
             return LogManager.getLogger("SkyHanni.$name")
         }
-
-        val modules: MutableList<Any> = ArrayList()
         private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob),
@@ -171,5 +190,6 @@ class SkyHanniMod {
                 }
             }
         }
+        //#endif
     }
 }
