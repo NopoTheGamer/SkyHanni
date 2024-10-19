@@ -1,9 +1,5 @@
 package at.hannibal2.skyhanni
 
-//#if FABRIC
-//$$ import net.fabricmc.api.ModInitializer;
-//#endif
-//#if FORGE
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -32,13 +28,17 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+//#if FABRIC
+//$$ import net.fabricmc.api.ModInitializer;
+//#endif
+//#if FORGE
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
 
 @Mod(
     modid = SkyHanniMod.MODID,
