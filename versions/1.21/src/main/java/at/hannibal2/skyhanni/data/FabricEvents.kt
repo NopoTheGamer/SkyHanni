@@ -14,6 +14,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.MutableText
 import net.minecraft.util.Formatting
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
+
 
 @SkyHanniModule
 object FabricEvents {
@@ -34,6 +38,18 @@ object FabricEvents {
         ClientPlayConnectionEvents.JOIN.register(
             ClientPlayConnectionEvents.Join { handler, sender, server ->
                 WorldChangeEvent.post()
+            },
+        )
+
+        ClientPlayConnectionEvents.DISCONNECT.register(
+            ClientPlayConnectionEvents.Disconnect { handler, client ->
+                ClientDisconnectEvent.post()
+            },
+        )
+
+        ClientEntityEvents.ENTITY_LOAD.register(
+            ClientEntityEvents.Load { entity, world ->
+                EntityEnterWorldEvent(entity).post()
             },
         )
 

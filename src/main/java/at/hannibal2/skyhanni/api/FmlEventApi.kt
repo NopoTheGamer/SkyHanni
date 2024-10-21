@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 @SkyHanniModule
 object FmlEventApi {
 
-    //todo preprocess add for fabric
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
         ClientDisconnectEvent.post()
