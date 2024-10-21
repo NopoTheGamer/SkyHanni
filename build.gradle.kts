@@ -54,6 +54,8 @@ loom {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
     }
+    if (target.minecraftVersion == MinecraftVersion.MC121) accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
+
     runs {
         named("client") {
             if (target == ProjectTarget.MAIN) {
