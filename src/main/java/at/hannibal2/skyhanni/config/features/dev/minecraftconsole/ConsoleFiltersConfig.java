@@ -50,4 +50,9 @@ public class ConsoleFiltersConfig {
     @ConfigOption(name = "Filter Biome ID Bounds", desc = "Filter message 'Biome ID is out of bounds'.")
     @ConfigEditorBoolean
     public boolean filterBiomeIdBounds = true;
+
+    @Expose
+    @ConfigOption(name = "Filter Property messages", desc = "Filter message 'Failed to verify signature on property'.")
+    @ConfigEditorBoolean
+    public boolean filterVerifyProperty = true;
 }
