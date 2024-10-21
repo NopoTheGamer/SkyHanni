@@ -6,6 +6,9 @@
     "description": "SkyHanni is a Minecraft Mod for Hypixel SkyBlock.",
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
+    "mixins": [
+        "skyhanni.mixins.json"
+    ],
     "entrypoints": {
         "main": [
             "at.hannibal2.skyhanni.SkyHanniMod"
