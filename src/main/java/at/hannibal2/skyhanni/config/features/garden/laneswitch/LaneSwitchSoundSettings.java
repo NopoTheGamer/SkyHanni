@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
+//#if FORGE
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures;
+//#endif
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
@@ -19,9 +21,11 @@ public class LaneSwitchSoundSettings {
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
     public float pitch = 1.0f;
 
+    //#if FORGE
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
     public Runnable testSound = FarmingLaneFeatures::playUserSound;
+    //#endif
 
     @Expose
     @ConfigOption(

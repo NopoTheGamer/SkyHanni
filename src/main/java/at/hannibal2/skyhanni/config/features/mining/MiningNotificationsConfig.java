@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+//#if FORGE
 import at.hannibal2.skyhanni.features.mining.MiningNotifications.MiningNotificationList;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -20,6 +22,7 @@ public class MiningNotificationsConfig {
     @FeatureToggle
     public boolean enabled = false;
 
+    //#if FORGE
     @Expose
     @ConfigOption(
         name = "Notification List",
@@ -33,6 +36,7 @@ public class MiningNotificationsConfig {
         MiningNotificationList.GOLDEN_GOBLIN,
         MiningNotificationList.DIAMOND_GOBLIN
     ));
+    //#endif
 
     @Expose
     @ConfigOption(name = "Play Sound", desc = "Plays a ding when a notification is triggered.")

@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
@@ -27,3 +28,4 @@ public class FarmingFortuneConfig {
     @ConfigLink(owner = FarmingFortuneConfig.class, field = "display")
     public Position pos = new Position(5, -180, false, true);
 }
+//#endif

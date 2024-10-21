@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if FORGE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.HighlightRabbitTypes;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -30,6 +32,7 @@ public class ChocolateFactoryConfig {
     @FeatureToggle
     public boolean statsDisplay = true;
 
+    //#if FORGE
     @Expose
     @ConfigOption(
         name = "Stats List",
@@ -55,6 +58,7 @@ public class ChocolateFactoryConfig {
         ChocolateFactoryStat.LEADERBOARD_POS,
         ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
     ));
+    //#endif
 
     @Expose
     @ConfigOption(name = "Show Stack Sizes", desc = "Show additional info as many items in the chocolate menu as the stack size.")
@@ -180,6 +184,7 @@ public class ChocolateFactoryConfig {
     @FeatureToggle
     public boolean highlightFoundRabbits = false;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Highlight Rabbits", desc = "Highlight specific rabbit types in Hoppity's Collection.")
     @ConfigEditorDraggableList
@@ -191,6 +196,7 @@ public class ChocolateFactoryConfig {
         HighlightRabbitTypes.SHOP,
         HighlightRabbitTypes.STRAYS
     ));
+    //#endif
 
     @Expose
     @ConfigOption(name = "Re-color Missing Rabbit Dyes", desc = "Replace the gray dye in Hoppity's Collection with a color for the rarity of the rabbit.")

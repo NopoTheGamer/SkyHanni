@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.skillprogress;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+//#if FORGE
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -20,6 +22,7 @@ public class AllSkillDisplayConfig {
     @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Text", desc = "Choose what skills you want to see in the display.")
     @ConfigEditorDraggableList
@@ -34,4 +37,5 @@ public class AllSkillDisplayConfig {
         SkillType.CARPENTRY,
         SkillType.TAMING
     ));
+    //#endif
 }

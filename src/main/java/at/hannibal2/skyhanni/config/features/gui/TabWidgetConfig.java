@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.gui;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.PositionList;
+//#if FORGE
 import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -29,6 +31,7 @@ public class TabWidgetConfig {
     @ConfigEditorInfoText
     public String text2;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
     @ConfigEditorDraggableList
@@ -37,4 +40,5 @@ public class TabWidgetConfig {
     @Expose
     @ConfigLink(owner = TabWidgetConfig.class, field = "enabled")
     public PositionList displayPositions = new PositionList(TabWidgetDisplay.getEntries().size());
+    //#endif
 }

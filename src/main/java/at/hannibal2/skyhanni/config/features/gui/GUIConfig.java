@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.config.features.gui;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig;
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig;
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig;
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig;
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig;
+//#if FORGE
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig;
 import at.hannibal2.skyhanni.data.GuiEditManager;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -27,18 +29,22 @@ public class GUIConfig {
     @Accordion
     public CompactTabListConfig compactTabList = new CompactTabListConfig();
 
+    //#if FORGE
     @Expose
     @Category(name = "Custom Scoreboard", desc = "Custom Scoreboard Settings")
     public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
+    //#endif
 
     @Expose
     @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
     @Accordion
     public ChromaConfig chroma = new ChromaConfig();
 
+    //#if FORGE
     @ConfigOption(name = "Edit GUI Locations", desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
     public Runnable positions = () -> GuiEditManager.openGuiPositionEditor(true);
+    //#endif
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")

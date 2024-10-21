@@ -2,6 +2,11 @@ package at.hannibal2.skyhanni.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
 import at.hannibal2.skyhanni.config.features.About;
+import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
+import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
+//#if FORGE
+import at.hannibal2.skyhanni.utils.LorenzUtils;
+//#endif
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig;
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig;
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig;
@@ -12,29 +17,26 @@ import at.hannibal2.skyhanni.config.features.fishing.FishingConfig;
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig;
 import at.hannibal2.skyhanni.config.features.gui.GUIConfig;
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig;
-import at.hannibal2.skyhanni.config.features.mining.MiningConfig;
-import at.hannibal2.skyhanni.config.features.misc.MiscConfig;
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig;
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig;
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig;
 import at.hannibal2.skyhanni.config.storage.Storage;
-import at.hannibal2.skyhanni.utils.LorenzUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.Social;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation;
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
-import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
 import java.util.List;
 
 
 public class Features extends Config {
-    public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
-    public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
-    public static final ResourceLocation PATREON = new ResourceLocation("notenoughupdates:social/patreon.png");
+    public static final MyResourceLocation DISCORD = new MyResourceLocation("notenoughupdates", "social/discord.png");
+    public static final MyResourceLocation GITHUB = new MyResourceLocation("notenoughupdates", "social/github.png");
+    public static final MyResourceLocation PATREON = new MyResourceLocation("notenoughupdates", "social/patreon.png");
 
     @Override
     public boolean shouldAutoFocusSearchbar() {
@@ -43,19 +45,23 @@ public class Features extends Config {
 
     @Override
     public HorizontalAlign alignCategory(ProcessedCategory category, boolean isSelected) {
+        //#if FORGE
         if (LorenzUtils.INSTANCE.isAprilFoolsDay())
             return HorizontalAlign.RIGHT;
         return super.alignCategory(category, isSelected);
+        //#else
+        //$$ return super.alignCategory(category, isSelected);
+        //#endif
     }
 
-    @Override
+   /*  @Override
     public List<Social> getSocials() {
         return Arrays.asList(
             Social.forLink("Discord", DISCORD, "https://discord.com/invite/skyhanni-997079228510117908"),
             Social.forLink("GitHub", GITHUB, "https://github.com/hannibal002/SkyHanni"),
             Social.forLink("Patreon", PATREON, "https://www.patreon.com/hannibal2")
         );
-    }
+    } */
 
     @Override
     public void saveNow() {
@@ -65,9 +71,10 @@ public class Features extends Config {
     @Override
     public String getTitle() {
         String modName = "SkyHanni";
+        //#if FORGE
         if (LorenzUtils.INSTANCE.isAprilFoolsDay())
             modName = new StringBuilder().append("اسکای هانی").reverse().toString(); // Minecraft does not render RTL strings very nicely, so we reverse the string here. Not authentic, but close enough.
-
+        //#endif
         return modName + " " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
@@ -157,7 +164,9 @@ public class Features extends Config {
     @Expose
     public Storage storage = new Storage();
 
+    //#if FORGE
     @Expose
     public int lastVersion = ConfigUpdaterMigrator.CONFIG_VERSION;
+    //#endif
 
 }

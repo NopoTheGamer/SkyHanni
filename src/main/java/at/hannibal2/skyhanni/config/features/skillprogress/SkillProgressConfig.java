@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.skillprogress;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if FORGE
 import at.hannibal2.skyhanni.utils.RenderUtils;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -19,6 +21,7 @@ public class SkillProgressConfig {
     @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Text Alignment", desc = "Align the display text with the progress bar.")
     @ConfigEditorDropdown
@@ -48,6 +51,7 @@ public class SkillProgressConfig {
             return str;
         }
     }
+    //#endif
 
     @Expose
     @ConfigOption(name = "Hide In Action Bar", desc = "Hide the skill progress in the Hypixel action bar.")

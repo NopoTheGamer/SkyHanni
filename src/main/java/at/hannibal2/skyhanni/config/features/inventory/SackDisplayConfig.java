@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
+//#if FORGE
 import at.hannibal2.skyhanni.utils.RenderUtils;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -38,10 +40,12 @@ public class SackDisplayConfig {
     @ConfigEditorDropdown
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
+    //#endif
 
     public enum NumberFormatEntry implements HasLegacyId {
         DEFAULT("Default", 0),

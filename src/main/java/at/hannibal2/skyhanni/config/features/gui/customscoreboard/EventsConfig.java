@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent;
@@ -33,3 +34,4 @@ public class EventsConfig {
     public boolean showAllActiveEvents = false;
 
 }
+//#endif

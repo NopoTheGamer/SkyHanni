@@ -6,10 +6,14 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
-//#if FORGE
-import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
+//#if FORGE
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -18,9 +22,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
@@ -35,8 +37,13 @@ import net.minecraft.client.gui.GuiScreen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.lwjgl.input.Keyboard
 //#if FABRIC
 //$$ import net.fabricmc.api.ModInitializer;
+//$$ import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
+//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
+//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+//$$ import java.io.File
 //#endif
 //#if FORGE
 import net.minecraftforge.common.MinecraftForge
@@ -71,6 +78,23 @@ class SkyHanniMod {
     //$$ override fun onInitialize() {
     //$$     onPreInit()
     //$$     onInit()
+    //$$     config = ManagedConfig.create(File("config/skyhanni/config.json"), Features::class.java)
+    //$$         ClientCommandRegistrationCallback.EVENT.register { a, b ->
+    //$$             a.register(
+    //$$                 literal("sh").executes {
+    //$$                     MinecraftClient.getInstance().send {
+    //$$                         if (config != null) config!!.openConfigGui()
+    //$$                     }
+    //$$                     0
+    //$$                 }
+    //$$             )
+    //$$             a.register(
+    //$$                 literal("update").executes {
+    //$$                     UpdateManager.updateCommand(arrayOf(""))
+    //$$                     0
+    //$$                 },
+    //$$             )
+    //$$         }
     //$$     println("SkyHanni initialized")
     //$$ }
     //#endif
@@ -92,18 +116,19 @@ class SkyHanniMod {
 
         CommandRegistrationEvent.post()
 
-        PreInitFinishedEvent.post()
         //#endif
+        PreInitFinishedEvent.post()
     }
 
     fun onInit() {
-        //#if FORGE
         configManager = ConfigManager()
         configManager.firstLoad()
-        initLogging()
+
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
+        //#if FORGE
+        initLogging()
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
@@ -155,32 +180,17 @@ class SkyHanniMod {
         val version: String get() = "@MOD_VERSION@"
 
         val modules: MutableList<Any> = ArrayList()
-        //#if FORGE
         @JvmField
         var feature: Features = Features()
-        lateinit var sackData: SackData
-        lateinit var friendsData: FriendsJson
-        lateinit var knownFeaturesData: KnownFeaturesJson
-        lateinit var jacobContestsData: JacobContestsJson
-
-        lateinit var visualWordsData: VisualWordsJson
-        lateinit var repo: RepoManager
+        //#if FABRIC
+        //$$ var config: ManagedConfig<Features>? = null
+        //#endif
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
-
-        fun getLogger(name: String): Logger {
-            return LogManager.getLogger("SkyHanni.$name")
-        }
         private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob),
         )
-        var screenToOpen: GuiScreen? = null
-        private var screenTicks = 0
-        fun consoleLog(message: String) {
-            logger.log(Level.INFO, message)
-        }
-
         fun launchCoroutine(function: suspend () -> Unit) {
             coroutineScope.launch {
                 try {
@@ -190,6 +200,23 @@ class SkyHanniMod {
                 }
             }
         }
+        fun consoleLog(message: String) {
+            logger.log(Level.INFO, message)
+        }
+        fun getLogger(name: String): Logger {
+            return LogManager.getLogger("SkyHanni.$name")
+        }
+        //#if FORGE
+        lateinit var sackData: SackData
+        lateinit var friendsData: FriendsJson
+        lateinit var knownFeaturesData: KnownFeaturesJson
+        lateinit var jacobContestsData: JacobContestsJson
+
+        lateinit var visualWordsData: VisualWordsJson
+        lateinit var repo: RepoManager
+
+        var screenToOpen: GuiScreen? = null
+        private var screenTicks = 0
         //#endif
     }
 }

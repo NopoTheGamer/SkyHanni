@@ -13,9 +13,11 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class About {
 
+    //#if FORGE
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
     public transient Void currentVersion = null;
+    //#endif
 
     @ConfigOption(name = "Check for Updates", desc = "Automatically check for updates on each startup")
     @Expose

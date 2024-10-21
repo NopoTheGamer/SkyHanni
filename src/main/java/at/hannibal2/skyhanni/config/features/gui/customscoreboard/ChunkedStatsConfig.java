@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStat;
@@ -30,3 +31,4 @@ public class ChunkedStatsConfig {
         minStep = 1)
     public int maxStatsPerLine = 3;
 }
+//#endif

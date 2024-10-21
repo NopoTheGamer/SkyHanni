@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.combat.broodmother;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if FORGE
 import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures.StageEntry;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -40,6 +42,7 @@ public class BroodmotherConfig {
     @FeatureToggle
     public boolean imminentWarning = false;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Chat Messages", desc = "Send a chat message when the Broodmother enters these stages.\n" +
         "§cThe 'Alive!' and 'Imminent' stages are overridden by the \"Spawn Alert\" and \"Imminent Warning\" features.")
@@ -48,6 +51,7 @@ public class BroodmotherConfig {
         StageEntry.SLAIN,
         StageEntry.ALIVE
     ));
+    //#endif
 
     @Expose
     @ConfigOption(name = "Stage on Server Join", desc = "Send a chat message with the Broodmother's current stage upon joining the Spider's Den.")

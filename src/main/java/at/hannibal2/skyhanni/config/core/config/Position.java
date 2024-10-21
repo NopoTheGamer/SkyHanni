@@ -24,11 +24,13 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager;
 import at.hannibal2.skyhanni.config.Features;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper;
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption;
 import net.minecraft.client.Minecraft;
+//#if FORGE
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper;
 import net.minecraft.client.gui.ScaledResolution;
+//#endif
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -141,6 +143,7 @@ public class Position {
         return clicked;
     }
 
+    //#if FORGE
     public int getAbsX0(int objWidth) {
         int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
 
@@ -152,6 +155,7 @@ public class Position {
 
         return calcAbs0(y, height, objHeight);
     }
+    //#endif
 
     private int calcAbs0(int axis, int length, int objLength) {
         int ret = axis;
@@ -166,7 +170,11 @@ public class Position {
     }
 
     public int moveX(int deltaX, int objWidth) {
-        int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
+        //#if FORGE
+        int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
+        //#else
+        //$$ int screenWidth = MinecraftClient.getInstance().getWindow().getWidth();
+        //#endif
         boolean wasPositiveX = this.x >= 0;
         this.x += deltaX;
 
@@ -200,7 +208,11 @@ public class Position {
     }
 
     public int moveY(int deltaY, int objHeight) {
+        //#if FORGE
         int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
+        //#else
+        //$$ int screenHeight = MinecraftClient.getInstance().getWindow().getHeight();
+        //#endif
         boolean wasPositiveY = this.y >= 0;
         this.y += deltaY;
 
@@ -234,10 +246,18 @@ public class Position {
     }
 
     public boolean canJumpToConfigOptions() {
+        //#if FORGE
         return linkField != null && ConfigGuiManager.INSTANCE.getEditorInstance().getProcessedConfig().getOptionFromField(linkField) != null;
+        //#else
+        //$$ return false;
+        //#endif
     }
 
     public void jumpToConfigOptions() {
+        //#if FABRIC
+        //$$ if (true) return;
+        //#endif
+        //#if FORGE
         MoulConfigEditor<Features> editor = ConfigGuiManager.INSTANCE.getEditorInstance();
         if (linkField == null) return;
         ProcessedOption option = editor.getProcessedConfig().getOptionFromField(linkField);
@@ -245,6 +265,7 @@ public class Position {
         editor.search("");
         if (!editor.goToOption(option)) return;
         SkyHanniMod.Companion.setScreenToOpen(new GuiScreenElementWrapper(editor));
+        //#endif
     }
 
     public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {

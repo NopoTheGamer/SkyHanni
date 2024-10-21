@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
@@ -150,3 +151,4 @@ public class DisplayConfig {
     @ConfigEditorBoolean
     public boolean cacheScoreboardOnIslandSwitch = false;
 }
+//#endif

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.dungeon;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+//#if FORGE
 import at.hannibal2.skyhanni.features.dungeon.DungeonSecretChime;
+//#endif
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -34,7 +36,9 @@ public class SecretChimeConfig {
     @ConfigEditorButton(buttonText = "OPEN")
     public Runnable soundsListURL = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
 
+    //#if FORGE
     @ConfigOption(name = "Play Sound", desc = "Plays current secret chime sound.")
     @ConfigEditorButton(buttonText = "Play")
     public Runnable checkSound = DungeonSecretChime::playSound;
+    //#endif
 }

@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter.textformatting;
 
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostFormatting;
@@ -147,3 +148,4 @@ public class TextFormattingConfig {
     @ConfigEditorText
     public String moneyMadeFormat = "  &6Money made: &b%value%";
 }
+//#endif

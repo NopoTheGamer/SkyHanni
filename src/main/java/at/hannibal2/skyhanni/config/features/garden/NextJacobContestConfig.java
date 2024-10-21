@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if FORGE
 import at.hannibal2.skyhanni.features.garden.CropType;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -91,6 +93,7 @@ public class NextJacobContestConfig {
     @ConfigEditorBoolean
     public boolean warnPopup = false;
 
+    //#if FORGE
     @Expose
     @ConfigOption(
         name = "Warn For",
@@ -98,6 +101,7 @@ public class NextJacobContestConfig {
     )
     @ConfigEditorDraggableList
     public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
+    //#endif
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+//#if FORGE
 import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -34,10 +36,12 @@ public class HotmConfig {
     @FeatureToggle
     public boolean powderSpent = true;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
     public @NotNull PowderSpentDesign powderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE;
+    //#endif
 
     @Expose
     @ConfigOption(name = "Powder for 10 Levels", desc = "Show the amount of powder needed to level a perk up 10 times when holding the shift key.")

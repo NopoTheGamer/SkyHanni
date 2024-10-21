@@ -1,5 +1,5 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.combat.ghostcounter;
-
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
@@ -141,3 +141,4 @@ public class GhostCounterConfig {
     @ConfigLink(owner = GhostCounterConfig.class, field = "enabled")
     public Position position = new Position(50, 50, false, true);
 }
+//#endif

@@ -95,10 +95,12 @@ public class GardenConfig {
     @Category(name = "Pests", desc = "Pests Settings")
     public PestsConfig pests = new PestsConfig();
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Farming Fortune Display", desc = "")
     @Accordion
     public FarmingFortuneConfig farmingFortunes = new FarmingFortuneConfig();
+    //#endif
 
     @Expose
     @ConfigOption(name = "Tooltip Tweaks", desc = "")

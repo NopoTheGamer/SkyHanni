@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if FORGE
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.MineshaftPityLine;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -20,6 +22,7 @@ public class MineshaftPityDisplayConfig {
     @FeatureToggle
     public boolean enabled = true;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change the appearance of the display.")
     @ConfigEditorDraggableList
@@ -30,6 +33,7 @@ public class MineshaftPityDisplayConfig {
         MineshaftPityLine.NEEDED_TO_PITY,
         MineshaftPityLine.TIME_SINCE_MINESHAFT
     ));
+    //#endif
 
     @Expose
     @ConfigOption(name = "Modify Spawn Message", desc = "Modify the Mineshaft spawn message with more stats.")

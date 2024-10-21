@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.config.storage;
 
+//#if FORGE
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
+//#endif
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ public class Storage {
     @Expose
     public Float savedMouseloweredSensitivity = .5f;
 
+    //#if FORGE
     @Deprecated
     @Expose
     public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
@@ -55,4 +58,5 @@ public class Storage {
 
     @Expose
     public Map<String, Reminder> reminders = new HashMap<>();
+    //#endif
 }

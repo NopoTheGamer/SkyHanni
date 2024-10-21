@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment;
@@ -24,3 +25,4 @@ public class AlignmentConfig {
     @ConfigEditorSlider(minValue = 0, maxValue = 50, minStep = 1)
     public int margin = 0;
 }
+//#endif

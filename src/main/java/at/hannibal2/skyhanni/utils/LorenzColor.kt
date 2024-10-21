@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+//#if FORGE
 import net.minecraft.item.EnumDyeColor
+//#endif
 import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
 
@@ -52,6 +54,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 
+    //#if FORGE
     fun toDyeColor(): EnumDyeColor = when (this) {
         WHITE -> EnumDyeColor.WHITE
         GOLD -> EnumDyeColor.ORANGE
@@ -73,12 +76,14 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
         CHROMA -> EnumDyeColor.WHITE
     }
+    //#endif
 
     fun toChatFormatting(): EnumChatFormatting? =
         EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() }
 
     companion object {
 
+        //#if FORGE
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
             EnumDyeColor.MAGENTA -> LIGHT_PURPLE
@@ -97,6 +102,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
             EnumDyeColor.BROWN -> GOLD
             EnumDyeColor.BLACK -> BLACK
         }
+        //#endif
 
         fun Char.toLorenzColor(): LorenzColor? = entries.firstOrNull { it.chatColorCode == this } ?: run {
             ErrorManager.logErrorWithData(

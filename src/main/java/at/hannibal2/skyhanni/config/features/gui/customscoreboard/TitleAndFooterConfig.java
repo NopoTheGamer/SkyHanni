@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.utils.RenderUtils;
@@ -39,3 +40,4 @@ public class TitleAndFooterConfig {
     @ConfigEditorText
     public Property<String> customFooter = Property.of("&ewww.hypixel.net");
 }
+//#endif

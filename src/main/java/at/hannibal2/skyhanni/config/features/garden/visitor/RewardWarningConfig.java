@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+//#if FORGE
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -40,6 +42,7 @@ public class RewardWarningConfig {
     public int bypassKey = Keyboard.KEY_LCONTROL;
 
 
+    //#if FORGE
     @Expose
     @ConfigOption(
         name = "Items",
@@ -56,6 +59,7 @@ public class RewardWarningConfig {
         VisitorReward.REPLENISH,
         VisitorReward.COPPER_DYE
     ));
+    //#endif
 
     @Expose
     @ConfigOption(
