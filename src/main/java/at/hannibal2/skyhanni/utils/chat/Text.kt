@@ -96,8 +96,10 @@ object Text {
         }
 
     fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
+        //#if FORGE
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
+        //#endif
     }
 
     fun createDivider(dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE) = HYPHEN.fitToChat().style {

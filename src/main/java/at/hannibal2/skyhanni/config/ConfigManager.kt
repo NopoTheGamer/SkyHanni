@@ -3,20 +3,21 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.test.command.ErrorManager
+//#if FORGE
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+//#endif
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -25,6 +26,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import org.apache.logging.log4j.LogManager
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -41,9 +43,13 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
+    //#if FORGE
     return if (LorenzUtils.isBetaVersion()) {
         registerTypeAdapterFactory(create)
     } else this
+    //#else
+    //$$ return registerTypeAdapterFactory(create)
+    //#endif
 }
 
 class ConfigManager {
@@ -56,7 +62,7 @@ class ConfigManager {
         var configDirectory = File("config/skyhanni")
     }
 
-    private val logger = LorenzLogger("config_manager")
+    private val logger = LogManager.getLogger("SkyHanni")
 
     private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
 
@@ -72,7 +78,7 @@ class ConfigManager {
 
     fun firstLoad() {
         if (jsonHolder.isNotEmpty()) {
-            logger.log("Loading config despite config being already loaded?")
+            logger.warn("Loading config despite config being already loaded?")
         }
         configDirectory.mkdirs()
 
@@ -89,7 +95,9 @@ class ConfigManager {
         val features = SkyHanniMod.feature
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
+        //#if FORGE
         UpdateManager.injectConfigProcessor(processor)
+        //#endif
         ConfigProcessorDriver(processor).processConfig(features)
 
         try {
@@ -160,13 +168,15 @@ class ConfigManager {
             println("2. Either add the Config Link.")
             println("3. Or add the name to ignoredMissingConfigLinks.")
             println("")
+            //#if FORGE
             LorenzUtils.shutdownMinecraft("Missing Config Link")
+            //#endif
         }
     }
 
     private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
         val fileName = fileType.fileName
-        logger.log("Trying to load $fileName from $file")
+        logger.warn("Trying to load $fileName from $file")
         var output: Any? = defaultValue
 
         if (file!!.exists()) {
@@ -175,18 +185,24 @@ class ConfigManager {
                 val bufferedReader = BufferedReader(inputStreamReader)
                 val lenientGson = BaseGsonBuilder.lenientGson().create()
 
-                logger.log("load-$fileName-now")
+                logger.warn("load-$fileName-now")
 
                 output = if (fileType == ConfigFileType.FEATURES) {
                     val jsonObject = lenientGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
+                    //#if FORGE
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
+                    //#else
+                    //$$ val newJsonObject = jsonObject
+                    //#endif
                     val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
                     if (PlatformUtils.isDevEnvironment) {
                         try {
                             run()
                         } catch (e: Throwable) {
-                            logger.log(e.stackTraceToString())
+                            logger.warn(e.stackTraceToString())
+                            //#if FORGE
                             LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
+                            //#endif
                         }
                     } else {
                         run()
@@ -195,26 +211,26 @@ class ConfigManager {
                     lenientGson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
                 }
 
-                logger.log("Loaded $fileName from file")
+                logger.warn("Loaded $fileName from file")
             } catch (e: Exception) {
-                logger.log(e.stackTraceToString())
+                logger.warn(e.stackTraceToString())
                 val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
-                logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
-                logger.log("Exception was $e")
+                logger.warn("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
+                logger.warn("Exception was $e")
                 try {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {
-                    logger.log("Could not create backup for $fileName file")
-                    logger.log(e.stackTraceToString())
+                    logger.warn("Could not create backup for $fileName file")
+                    logger.warn(e.stackTraceToString())
                 }
             }
         }
 
         if (output == defaultValue) {
-            logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
+            logger.warn("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
         }
         if (output == null) {
-            logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
+            logger.warn("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
             output = defaultValue
         }
 
@@ -222,16 +238,21 @@ class ConfigManager {
     }
 
     fun saveConfig(fileType: ConfigFileType, reason: String) {
+        //#if FORGE
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
         saveFile(fileType.file, fileType.fileName, json, reason)
+        //#else
+        //$$ if (SkyHanniMod.config != null) SkyHanniMod.config!!.saveToFile()
+        //$$ logger.warn("saveConfig: $reason")
+        //#endif
     }
 
     private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
-        logger.log("saveConfig: $reason")
+        logger.warn("saveConfig: $reason")
         if (file == null) throw Error("Can not save $fileName, ${fileName}File is null!")
         try {
-            logger.log("Saving $fileName file")
+            logger.warn("Saving $fileName file")
             file.parentFile.mkdirs()
             val unit = file.parentFile.resolve("$fileName.json.write")
             unit.createNewFile()
@@ -241,8 +262,8 @@ class ConfigManager {
             // Perform move — which is atomic, unlike writing — after writing is done.
             move(unit, file, reason)
         } catch (e: IOException) {
-            logger.log("Could not save $fileName file to $file")
-            logger.log(e.stackTraceToString())
+            logger.warn("Could not save $fileName file to $file")
+            logger.warn(e.stackTraceToString())
         }
     }
 
@@ -263,7 +284,9 @@ class ConfigManager {
                 )
                 return
             }
+            //#if FORGE
             ChatUtils.debug("config save AccessDeniedException! (loop $loop)")
+            //#endif
             DelayedRun.runNextTick {
                 move(unit, file, reason, loop + 1)
             }
@@ -277,11 +300,13 @@ class ConfigManager {
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
     FEATURES("config", Features::class.java, SkyHanniMod::feature),
+    //#if FORGE
     SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
     FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    //#endif
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

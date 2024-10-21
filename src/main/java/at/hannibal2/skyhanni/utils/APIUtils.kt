@@ -94,8 +94,11 @@ object APIUtils {
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")
                             println(" - getJSONResponse: '$urlString'")
+                            //#if FORGE
                             ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
+                            //#endif
                         } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
+                            //#if FORGE
                             if (showApiErrors && apiName == "Hypixel API") {
                                 ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
@@ -110,6 +113,7 @@ object APIUtils {
                                 "urlString" to urlString,
                                 "returnedData" to retSrc,
                             )
+                            //#endif
                         } else {
                             ErrorManager.skyHanniError(
                                 "SkyHanni Connection Error",
@@ -208,6 +212,8 @@ object APIUtils {
     // TODO remove command, use clickable chat message instead
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
+        //#if FORGE
         ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+        //#endif
     }
 }

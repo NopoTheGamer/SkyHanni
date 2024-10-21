@@ -4,16 +4,19 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorJson
+//#if FORGE
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+//#endif
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.client.Minecraft
+import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -74,19 +77,25 @@ object ErrorManager {
     }
 
     private fun copyError(errorId: String) {
+        //#if FORGE
         val fullErrorMessage = KeyboardManager.isModifierKeyDown()
+        //#else
+        //$$ val fullErrorMessage = false
+        //#endif
         val errorMessage = if (fullErrorMessage) {
             fullErrorMessages[errorId]
         } else {
             errorMessages[errorId]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
+        //#if FORGE
         ChatUtils.chat(
             errorMessage?.let {
                 OSUtils.copyToClipboard(it)
                 "$name copied into the clipboard, please report it on the SkyHanni discord!"
             } ?: "Error id not found!",
         )
+        //#endif
     }
 
     fun logErrorStateWithData(
@@ -129,7 +138,9 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
+        //#if FORGE
         if (betaOnly && !LorenzUtils.isBetaVersion()) return
+        //#endif
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
@@ -152,26 +163,36 @@ object ErrorManager {
             fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
             stackTrace = throwable.getCustomStackTrace(false).joinToString("\n")
         }
-        val randomId = StringUtils.generateRandomId()
+        val randomId = UUID.randomUUID().toString()
 
         val extraDataString = buildExtraDataString(extraData)
+        //#if FORGE
         val rawMessage = message.removeColor()
+        //#else
+        //$$ val rawMessage = message
+        //#endif
         errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
             "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         val finalMessage = buildFinalMessage(message) ?: return
+        //#if FORGE
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,
         )
+        //#endif
     }
 
     private fun buildFinalMessage(message: String): String? {
         var finalMessage = message
+        //#if FORGE
         val rawMessage = message.removeColor()
+        //#else
+        //$$ val rawMessage = message
+        //#endif
 
         var hideError = false
         for (repoError in repoErrors) {
@@ -191,7 +212,9 @@ object ErrorManager {
                     hideError = false
                 }
                 repoError.customMessage?.let {
+                    //#if FORGE
                     ChatUtils.userError(it)
+                    //#endif
                     return null
                 }
                 break
@@ -204,6 +227,7 @@ object ErrorManager {
         return if (hideError) null else finalMessage
     }
 
+    //#if FORGE
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RepoErrorJson>("ChangedChatErrors")
@@ -211,6 +235,7 @@ object ErrorManager {
 
         repoErrors = data.changedErrorMessages.filter { version in it.affectedVersions }
     }
+    //#endif
 
     private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
         val extraDataString = if (extraData.isNotEmpty()) {

@@ -86,6 +86,8 @@ class FeatureToggleProcessor : ConfigStructureReader {
         )
     }
 
+    //#if FORGE
     @Suppress("EmptyFunctionBlock")
     override fun emitGuiOverlay(baseObject: Any?, field: Field?, option: ConfigOption?) {}
+    //#endif
 }

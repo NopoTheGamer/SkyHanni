@@ -31,23 +31,16 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
             ?.asStarProjectedType()
 
-        val exceptions = listOf("SkyHanniMod", "HandleEvent", "IslandType")
-
         resolver.getAllFiles().forEach {
             var path = it.filePath
-            for (exception in exceptions) {
-                if (path.contains(exception)) {
-                    return@forEach
-                }
-            }
-            path = path.replace("src/main/", "versions/1.16.5/src/main/")
+            path = path.replace("src/main/", "versions/1.21/src/main/")
             //logger.warn(path)
             val file3 = Path(path)
 
-            file3.parent?.toFile()?.mkdirs()
+            //file3.parent?.toFile()?.mkdirs()
 
             if (!file3.exists()) {
-               // file3.createFile()
+                //file3.createFile()
             }
         }
 

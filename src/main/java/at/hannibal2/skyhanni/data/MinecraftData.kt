@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.events.WorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 //#if FORGE
 import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
@@ -25,6 +27,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 //$$ import net.minecraft.client.MinecraftClient
 //$$ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 //$$ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+//$$ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
+//$$ import net.minecraft.text.MutableText
 //#endif
 
 @SkyHanniModule
@@ -119,6 +123,29 @@ object MinecraftData {
     //$$    ClientPlayConnectionEvents.JOIN.register(ClientPlayConnectionEvents.Join { handler, sender, server ->
     //$$          WorldChangeEvent.post()
     //$$    })
-    //$$ }
+    //$$
+    //$$
+    //$$
+    //$$
+    //$$
+    //$$
+    //$$
+    //$$ ClientReceiveMessageEvents.ALLOW_GAME.register {message, overlay ->
+//$$    if (!overlay) {
+//$$    val plainText = message.siblings.joinToString("") { sibling ->
+//$$        sibling.string //todo this shit is fucked
+//$$    }
+//$$
+//$$    println(plainText)
+//$$    SkyHanniChatEvent(plainText, MutableText.of(message.content)).post()
+//$$        println("Cool feature activated!")
+//$$        true
+//$$    } else {
+//$$            ActionBarUpdateEvent(message.content.toString(), MutableText.of(message.content)).post()
+//$$        true
+//$$    }
+//$$    }
+    //$$
+    //$$     }
     //#endif
 }

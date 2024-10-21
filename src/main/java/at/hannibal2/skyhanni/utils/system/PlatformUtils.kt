@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils.system
 
+//#if FORGE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.ModContainer
+//#endif
 
 /**
  * This object contains utilities for all platform specific operations.
@@ -10,6 +12,7 @@ import net.minecraftforge.fml.common.ModContainer
  */
 object PlatformUtils {
 
+    //#if FORGE
     private val modPackages: Map<String, ModContainer> by lazy {
         Loader.instance().modList.flatMap { mod -> mod.ownedPackages.map { it to mod } }.toMap()
     }
@@ -23,6 +26,10 @@ object PlatformUtils {
     }
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
+    //#endif
+    //#if FABRIC
+    //$$ val isDevEnvironment = true
+    //#endif
 
 }
 

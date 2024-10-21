@@ -1,3 +1,4 @@
+//#if FORGE
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
@@ -40,10 +41,12 @@ public class CustomScoreboardConfig {
         scoreboardEntries.addAll(ScoreboardElement.defaultOption);
     };
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
     @Accordion
     public DisplayConfig display = new DisplayConfig();
+    //#endif
 
     @Expose
     @ConfigOption(name = "Background Options", desc = "")
@@ -64,3 +67,4 @@ public class CustomScoreboardConfig {
     @ConfigLink(owner = CustomScoreboardConfig.class, field = "enabled")
     public Position position = new Position(10, 80, false, true);
 }
+//#endif

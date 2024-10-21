@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
+//#if FORGE
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+//#endif
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.reflect.KMutableProperty0
@@ -101,7 +103,9 @@ object ConfigUtils {
         val option = tryFindEditor(editor) ?: return false
         editor.search("")
         if (!editor.goToOption(option)) return false
+        //#if FORGE
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        //#endif
         return true
     }
 }

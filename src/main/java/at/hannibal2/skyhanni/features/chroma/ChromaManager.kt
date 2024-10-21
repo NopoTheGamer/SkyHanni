@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.chroma
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+//#if FORGE
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+//#endif
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
@@ -23,8 +25,10 @@ object ChromaManager {
         }
     }
 
+    //#if FORGE
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "chroma", "gui.chroma")
     }
+    //#endif
 }

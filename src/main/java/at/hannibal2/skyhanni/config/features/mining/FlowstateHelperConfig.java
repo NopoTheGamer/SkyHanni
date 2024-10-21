@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if FORGE
 import at.hannibal2.skyhanni.features.mining.FlowstateElements;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -21,10 +23,12 @@ public class FlowstateHelperConfig {
     @FeatureToggle
     public boolean enabled = false;
 
+    //#if FORGE
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance.")
     @ConfigEditorDraggableList()
     public List<FlowstateElements> appearance = new ArrayList<>(FlowstateElements.defaultOption);
+    //#endif
 
     @Expose
     @ConfigOption(name = "Dynamic Color", desc = "Makes the timer's color dynamic.")

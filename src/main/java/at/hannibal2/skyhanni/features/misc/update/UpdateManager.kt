@@ -2,15 +2,17 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.About.UpdateStream
+//#if FORGE
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import net.minecraftforge.common.MinecraftForge
+//#endif
+import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.APIUtils
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -21,14 +23,13 @@ import moe.nea.libautoupdate.UpdateSource
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.common.MinecraftForge
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 
 @SkyHanniModule
 object UpdateManager {
 
-    private val logger = LorenzLogger("update_manager")
+    private val logger = SkyHanniMod.logger
     private var _activePromise: CompletableFuture<*>? = null
     private var activePromise: CompletableFuture<*>?
         get() = _activePromise
@@ -44,25 +45,31 @@ object UpdateManager {
         return potentialUpdate?.update?.versionNumber?.asString
     }
 
+    //#if FORGE
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         SkyHanniMod.feature.about.updateStream.onToggle {
             reset()
         }
     }
+    //#endif
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
+        //#if FORGE
         MinecraftForge.EVENT_BUS.unregister(this)
         if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
+        //#endif
     }
 
     fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
+        //#if FORGE
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
         }
+        //#endif
     }
 
     fun isCurrentlyBeta(): Boolean {
@@ -75,16 +82,16 @@ object UpdateManager {
         updateState = UpdateState.NONE
         _activePromise = null
         potentialUpdate = null
-        logger.log("Reset update state")
+        logger.warn("Reset update state")
     }
 
     fun checkUpdate(forceDownload: Boolean = false, forcedUpdateStream: UpdateStream = config.updateStream.get()) {
         var updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
-            logger.log("Trying to perform update check while another update is already in progress")
+            logger.warn("Trying to perform update check while another update is already in progress")
             return
         }
-        logger.log("Starting update check")
+        logger.warn("Starting update check")
         val currentStream = config.updateStream.get()
         if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
             config.updateStream = Property.of(UpdateStream.BETA)
@@ -92,44 +99,52 @@ object UpdateManager {
         }
         activePromise = context.checkUpdate(updateStream.stream)
             .thenAcceptAsync({
-                logger.log("Update check completed")
+                logger.warn("Update check completed")
                 if (updateState != UpdateState.NONE) {
-                    logger.log("This appears to be the second update check. Ignoring this one")
+                    logger.warn("This appears to be the second update check. Ignoring this one")
                     return@thenAcceptAsync
                 }
                 potentialUpdate = it
                 if (it.isUpdateAvailable) {
                     updateState = UpdateState.AVAILABLE
                     if (config.fullAutoUpdates || forceDownload) {
+                        //#if FORGE
                         ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now.")
+                        //#endif
                         queueUpdate()
                     } else if (config.autoUpdates) {
+                        //#if FORGE
                         ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
                             config::autoUpdates
                         )
+                        //#endif
                     }
                 } else if (forceDownload) {
+                    //#if FORGE
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
+                    //#endif
                 }
             }, DelayedRun.onThread)
     }
 
     fun queueUpdate() {
         if (updateState != UpdateState.AVAILABLE) {
-            logger.log("Trying to enqueue an update while another one is already downloaded or none is present")
+            logger.warn("Trying to enqueue an update while another one is already downloaded or none is present")
         }
         updateState = UpdateState.QUEUED
         activePromise = CompletableFuture.supplyAsync {
-            logger.log("Update download started")
+            logger.warn("Update download started")
             potentialUpdate!!.prepareUpdate()
         }.thenAcceptAsync({
-            logger.log("Update download completed, setting exit hook")
+            logger.warn("Update download completed, setting exit hook")
             updateState = UpdateState.DOWNLOADED
             potentialUpdate!!.executePreparedUpdate()
+            //#if FORGE
             ChatUtils.chat("Download of update complete. ")
             ChatUtils.chat("§aThe update will be installed after your next restart.")
+            //#endif
         }, DelayedRun.onThread)
     }
 
@@ -139,14 +154,18 @@ object UpdateManager {
         object : CurrentVersion {
             val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
             override fun display(): String {
+                //#if FORGE
                 if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
                     return "Force Outdated"
+                //#endif
                 return normalDelegate.display()
             }
 
             override fun isOlderThan(element: JsonElement): Boolean {
+                //#if FORGE
                 if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
                     return true
+                //#endif
                 return normalDelegate.isOlderThan(element)
             }
 
@@ -186,6 +205,7 @@ object UpdateManager {
 
         val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
         if (switchingToBeta) {
+            //#if FORGE
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
@@ -194,6 +214,7 @@ object UpdateManager {
                 "§eClick to confirm!",
                 oneTimeClick = true,
             )
+            //#endif
         } else {
             UpdateManager.checkUpdate(true, updateStream)
         }
