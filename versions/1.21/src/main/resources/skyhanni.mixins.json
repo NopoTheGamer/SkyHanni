@@ -4,6 +4,7 @@
   "package": "at.hannibal2.skyhanni.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "transformers.MixinClientConnection",
     "transformers.MixinClientPlayNetworkHandler",
     "transformers.MixinKeyboard",
     "transformers.MixinMouse",
