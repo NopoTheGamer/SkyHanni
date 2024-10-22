@@ -51,30 +51,24 @@ object TabListData {
 
     fun toggleDebug() {
         if (debugCache != null) {
-            //#if FORGE
             ChatUtils.chat("Disabled tab list debug.")
-            //#endif
             debugCache = null
             return
         }
         SkyHanniMod.coroutineScope.launch {
             val clipboard = OSUtils.readFromClipboard() ?: return@launch
             debugCache = clipboard.lines()
-            //#if FORGE
             ChatUtils.chat("Enabled tab list debug with your clipboard.")
-            //#endif
         }
     }
 
     fun copyCommand(args: Array<String>) {
         if (debugCache != null) {
-            //#if FORGE
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
                 onClick = { toggleDebug() },
                 "§eClick to disable!"
             )
-            //#endif
             return
         }
 
@@ -94,9 +88,7 @@ object TabListData {
             "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
 
         OSUtils.copyToClipboard(string)
-        //#if FORGE
         ChatUtils.chat("Tab list copied into the clipboard!")
-        //#endif
     }
 
     private val playerOrdering = Ordering.from(PlayerComparator())
