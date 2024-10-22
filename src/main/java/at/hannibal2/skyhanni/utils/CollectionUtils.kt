@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+//#if FORGE
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
+//#endif
 import java.util.Collections
 import java.util.Queue
 import java.util.WeakHashMap
@@ -152,6 +154,7 @@ object CollectionUtils {
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
+    //#if FORGE
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
         val entry = entries.find(matcher)
@@ -467,4 +470,5 @@ object CollectionUtils {
     fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
         if (index < size) add(index, element) else add(element)
     }
+    //#endif
 }

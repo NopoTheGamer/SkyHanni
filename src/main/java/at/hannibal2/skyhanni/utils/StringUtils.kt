@@ -2,15 +2,17 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+//#if FORGE
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
+import net.minecraft.client.gui.GuiUtilRenderComponents
+import net.minecraft.util.ChatComponentText
+//#endif
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
@@ -195,6 +197,7 @@ object StringUtils {
         return null
     }
 
+    //#if FORGE
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
         val matcher = stringColorPattern.matcher(string)
         if (matcher.matches()) {
@@ -207,6 +210,7 @@ object StringUtils {
         }
         return default
     }
+    //#endif
 
     fun String.substringBeforeLastOrNull(needle: String): String? {
         val index = this.lastIndexOf(needle)
@@ -232,6 +236,7 @@ object StringUtils {
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
+    //#if FORGE
     fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
         ChatComponentText(this),
         width,
@@ -246,6 +251,7 @@ object StringUtils {
             codes + text.removeRange(matcher.range)
         } ?: text
     }
+    //#endif
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -292,8 +298,10 @@ object StringUtils {
         return builder.toString()
     }
 
+    //#if FORGE
     fun String.capAtMinecraftLength(limit: Int) =
         capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
+    //#endif
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
         var i = 0
@@ -316,6 +324,7 @@ object StringUtils {
         return false
     }
 
+    //#if FORGE
     // replaces a word without breaking any chat components
     fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
         modifyFirstChatComponent(chatComponent) { component ->
@@ -332,6 +341,7 @@ object StringUtils {
         }
         return chatComponent
     }
+    //#endif
 
     fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
@@ -388,18 +398,21 @@ object StringUtils {
 
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
+    //#if FORGE
     fun replaceIfNeeded(
         original: ChatComponentText,
         newText: String,
     ): ChatComponentText? {
         return replaceIfNeeded(original, ChatComponentText(newText))
     }
+    //#endif
 
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
     fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {
         return colorMap[char]
     }
 
+    //#if FORGE
     fun doLookTheSame(left: IChatComponent, right: IChatComponent): Boolean {
         class ChatIterator(var component: IChatComponent) {
             var queue = mutableListOf<IChatComponent>()
@@ -458,6 +471,7 @@ object StringUtils {
         }
     }
 
+
     fun <T : IChatComponent> replaceIfNeeded(
         original: T,
         newText: T,
@@ -465,11 +479,12 @@ object StringUtils {
         if (doLookTheSame(original, newText)) return null
         return newText
     }
+    //#endif
 
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
         val clickEvent = message.chatStyle.chatClickEvent
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
                 return
             }
             foundCommands.add(message)
@@ -479,6 +494,8 @@ object StringUtils {
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
+    //#if FORGE
+
     fun SystemMessageEvent.applyIfPossible(transform: (String) -> String) {
         val original = chatComponent.formattedText
         val new = transform(original)
@@ -511,6 +528,7 @@ object StringUtils {
             hoverEvents.add(hoverEvent)
         }
     }
+    //#endif
 
     fun String.replaceAll(oldValue: String, newValue: String, ignoreCase: Boolean = false): String {
         var text = this
@@ -538,6 +556,7 @@ object StringUtils {
         return message
     }
 
+    //#if FORGE
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         val text = ChatComponentText(this)
         text.chatStyle = original.sampleStyleAtStart()
@@ -556,6 +575,7 @@ object StringUtils {
         formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
+    //#endif
 
     fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
 

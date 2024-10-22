@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+//#if FORGE
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
+//#endif
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.time.LocalDate
@@ -139,6 +141,7 @@ object TimeUtils {
         /**
          * We replace the line here, because the user might want color month names
          */
+        //#if FORGE
         return tryToReplaceScoreboardLine(
             if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
                 "$datePart, $timePart"
@@ -146,6 +149,9 @@ object TimeUtils {
                 "$datePart$timePart".trim()
             },
         ) ?: ""
+        //#else
+        //$$ return ""
+        //#endif
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))

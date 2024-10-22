@@ -3,11 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+//#if FORGE
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
@@ -16,23 +17,24 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.util.ChatComponentText
+import net.minecraftforge.fml.common.FMLCommonHandler
+//#endif
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.FMLCommonHandler
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -53,23 +55,32 @@ object LorenzUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
+    //#if FORGE
     @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
     val inDungeons get() = DungeonAPI.inDungeon()
+    //#endif
 
     /**
      * Consider using [IslandType.isInIsland] instead
      */
+    //#if FORGE
     val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
-
-    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
+    //#else
+    //$$     val skyBlockIsland get() = HypixelData.skyBlockIsland
+    //#endif
+    //#if FORGE
 
     val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
+
+    val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
+
+    //#endif
+
+    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val noTradeMode get() = HypixelData.noTrade
 
     val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
-
-    val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
     val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
@@ -81,9 +92,11 @@ object LorenzUtils {
             val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
             val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
             val result = (!never && (always || itsTime))
+            //#if FORGE
             if (previousApril != result) {
                 ModifyVisualWords.textCache.clear()
             }
+            //#endif
             previousApril = result
             return result
         }
@@ -111,10 +124,11 @@ object LorenzUtils {
     @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
     fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
+    //#if FORGE
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
-
+//#endif
     // TODO create extension function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
@@ -153,12 +167,23 @@ object LorenzUtils {
 
     fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
 
-    fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
+    fun getRawPlayerUuid()
+    //#if FORGE
+        = Minecraft.getMinecraft().thePlayer.uniqueID
+    //#else
+    //$$ = MinecraftClient.getInstance().player?.uuid
+    //#endif
 
-    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String
+    //#if FORGE
+    = Minecraft.getMinecraft().thePlayer.name
+    //#else
+    //$$ = MinecraftClient.getInstance().player?.name?.literalString ?: ""
+    //#endif
 
     fun getPlayer(): EntityPlayerSP? = Minecraft.getMinecraft()?.thePlayer
 
+    //#if FORGE
     // TODO move into renderable utils
     fun fillTable(
         data: List<DisplayTableEntry>,
@@ -198,6 +223,8 @@ object LorenzUtils {
         lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
 
+    //#endif
+
     // TODO move into string api
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
@@ -213,6 +240,7 @@ object LorenzUtils {
         }
     }
 
+    //#if FORGE
     @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
@@ -247,7 +275,9 @@ object LorenzUtils {
             add(" ")
         }
     }
+    //#endif
 
+    //#if FORGE
     @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
     inline fun MutableList<List<Any>>.addButton(
         prefix: String,
@@ -287,11 +317,14 @@ object LorenzUtils {
             )
     }
 
+    //#endif
+
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
 
+    //#if FORGE
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
@@ -308,19 +341,24 @@ object LorenzUtils {
 
     // TODO move into mayor api
     val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
+//#endif
 
+    //#if FORGE
     // TODO move into mayor api
     fun Int.derpy() = if (isDerpy) this / 2 else this
 
     // TODO move into mayor api
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
+    //#endif
 
     // TODO move into json api
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
+    //#if FORGE
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         TitleManager.sendTitle(text, duration, height, fontSize)
     }
+    //#endif
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
         val enums = enumValues<T>()
@@ -341,7 +379,9 @@ object LorenzUtils {
         reason?.let {
             System.err.println("Reason: $it")
         }
+        //#if FORGE
         FMLCommonHandler.instance().handleExit(-1)
+        //#endif
     }
 
     /**
@@ -374,6 +414,7 @@ object LorenzUtils {
     }
 
     // TODO move into location utils
+    //#if FORGE
     fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
         val cornerTwo = LorenzVec(minX, y, maxZ)
@@ -382,4 +423,5 @@ object LorenzUtils {
 
         return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
     }
+    //#endif
 }
