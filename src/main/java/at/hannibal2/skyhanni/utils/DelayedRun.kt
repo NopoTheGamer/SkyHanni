@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-//#if FORGE
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
-//#endif
 import at.hannibal2.skyhanni.utils.compat.isOnMainThread
 import net.minecraft.client.Minecraft
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -33,18 +31,12 @@ object DelayedRun {
                 try {
                     runnable()
                 } catch (e: Exception) {
-                    //#if FORGE
                     ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing")
-                    //#endif
                 }
             }
             inPast
         }
-        //#if FORGE
         futureTasks.drainTo(tasks)
-        //#else
-        //$$ while (true) tasks.add(futureTasks.poll() ?: break)
-        //#endif
     }
 
     @JvmField

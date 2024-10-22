@@ -1,32 +1,30 @@
+//#if FORGE
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.SkyHanniTickEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.events.WorldChangeEvent
-//#if FORGE
-import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
-//#endif
 
 @SkyHanniModule
 object MinecraftData {
-    var totalTicks = 0
-    //#if FORGE
+
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
     fun onSoundPacket(event: PacketReceivedEvent) {
         val packet = event.packet
@@ -41,6 +39,11 @@ object MinecraftData {
         ) {
             event.cancel()
         }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: WorldEvent.Load) {
+        WorldChangeEvent.post()
     }
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
@@ -60,6 +63,18 @@ object MinecraftData {
         ) {
             event.cancel()
         }
+    }
+
+    var totalTicks = 0
+
+    @SubscribeEvent
+    fun onTick(event: TickEvent.ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.START) return
+        Minecraft.getMinecraft().thePlayer ?: return
+
+        DelayedRun.checkRuns()
+        totalTicks++
+        SkyHanniTickEvent(totalTicks).post()
     }
 
     @HandleEvent
@@ -85,22 +100,5 @@ object MinecraftData {
         InventoryUtils.itemInHandId = NEUInternalName.NONE
         InventoryUtils.recentItemsInHand.clear()
     }
-
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
-        WorldChangeEvent.post()
-    }
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) return
-        Minecraft.getMinecraft().thePlayer ?: return
-
-        DelayedRun.checkRuns()
-        totalTicks++
-        SkyHanniTickEvent(totalTicks).post()
-    }
-
-    //#endif
 }
+//#endif

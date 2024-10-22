@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 //#if FORGE
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 //#else
 //$$ import net.minecraft.scoreboard.ScoreboardDisplaySlot
 //$$ import net.minecraft.util.Formatting
@@ -196,7 +196,6 @@ object HypixelData {
         )
     }
 
-    //#if FORGE
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Server ID")
@@ -222,7 +221,6 @@ object HypixelData {
             }
         }
     }
-    //#endif
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
@@ -530,9 +528,7 @@ object HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).post()
             if (islandType == IslandType.UNKNOWN) {
-                //#if FORGE
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
-                //#endif
                 loggerIslandChange.log("Unknown: '$foundIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)

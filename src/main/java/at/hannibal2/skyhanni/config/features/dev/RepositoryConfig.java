@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
-//#if FORGE
 import at.hannibal2.skyhanni.data.repo.RepoUtils;
-//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -18,11 +16,9 @@ public class RepositoryConfig {
     @ConfigEditorBoolean
     public boolean repoAutoUpdate = true;
 
-    //#if FORGE
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
     public Runnable updateRepo = RepoUtils::updateRepo;
-    //#endif
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")
@@ -31,11 +27,9 @@ public class RepositoryConfig {
 
     public static class RepositoryLocation {
 
-        //#if FORGE
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
         public Runnable resetRepoLocation = RepoUtils::resetRepoLocation;
-        //#endif
 
         @Expose
         @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002")

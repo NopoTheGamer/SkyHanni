@@ -37,7 +37,7 @@ fun Minecraft.isOnMainThread() =
 //#endif
 
 fun IChatComponent.getFormattedTextCompat() =
-//#if FORGE
+//#if MC < 1.16
     this.formattedText
 //#else
 //$$     run {
@@ -50,7 +50,7 @@ fun IChatComponent.getFormattedTextCompat() =
 //$$     }
 //#endif
 
-//#if FORGE
+//#if MC <1.12
 object Effects {
     val invisibility =
 

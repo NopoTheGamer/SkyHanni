@@ -159,7 +159,7 @@ object ErrorManager {
             fullStackTrace = throwable.getCustomStackTrace(true).joinToString("\n")
             stackTrace = throwable.getCustomStackTrace(false).joinToString("\n")
         }
-        val randomId = UUID.randomUUID().toString()
+        val randomId = StringUtils.generateRandomId()
 
         val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()

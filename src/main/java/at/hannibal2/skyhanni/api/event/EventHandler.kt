@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
-//#if FORGE
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.StringUtils
+//#if FORGE
 import at.hannibal2.skyhanni.utils.chat.Text
 //#endif
 
@@ -41,12 +41,10 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             } catch (throwable: Throwable) {
                 errors++
                 if (errors <= 3) {
-                    //#if FORGE
                     val errorName = throwable::class.simpleName ?: "error"
                     val aOrAn = StringUtils.optionalAn(errorName)
                     val message = "Caught $aOrAn $errorName in ${listener.name} at $name: ${throwable.message}"
                     ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = onError != null)
-                    //#endif
                 }
                 onError?.invoke(throwable)
             }
@@ -68,10 +66,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
     private fun shouldInvoke(event: SkyHanniEvent, listener: EventListeners.Listener): Boolean {
         if (SkyHanniEvents.isDisabledInvoker(listener.name)) return false
-        //#if FORGE
         if (listener.options.onlyOnSkyblock && !LorenzUtils.inSkyBlock) return false
         if (IslandType.ANY !in listener.onlyOnIslandTypes && !inAnyIsland(listener.onlyOnIslandTypes)) return false
-        //#endif
         if (event.isCancelled && !listener.options.receiveCancelled) return false
         if (
             event is GenericSkyHanniEvent<*> &&

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 //#if FORGE
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.send
@@ -121,9 +121,7 @@ class RepoManager(private val configLocation: File) {
                     lastRepoUpdate.passedSince() < 1.minutes
                 ) {
                     if (command) {
-                        //#if FORGE
                         ChatUtils.chat("§7The repo is already up to date!")
-                        //#endif
                         atomicShouldManuallyReload.set(false)
                     }
                     return@supplyAsync false
@@ -199,12 +197,9 @@ class RepoManager(private val configLocation: File) {
             }
             comp.complete(null)
             if (answerMessage.isNotEmpty() && !error) {
-                //#if FORGE
                 ChatUtils.chat("§a$answerMessage")
-                //#endif
             }
             if (error) {
-                //#if FORGE
                 ChatUtils.clickableChat(
                     "Error with the repo detected, try /shupdaterepo to fix it!",
                     onClick = {
@@ -213,7 +208,6 @@ class RepoManager(private val configLocation: File) {
                     "§eClick to update the repo!",
                     prefixColor = "§c",
                 )
-                //#endif
                 if (unsuccessfulConstants.isEmpty()) {
                     unsuccessfulConstants.add("All Constants")
                 }
@@ -266,12 +260,9 @@ class RepoManager(private val configLocation: File) {
         }
         val currentCommit = readCurrentCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            //#if FORGE
             ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
-            //#endif
             return
         }
-        //#if FORGE
         ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
@@ -284,7 +275,6 @@ class RepoManager(private val configLocation: File) {
         for (constant in unsuccessfulConstants) {
             ChatUtils.chat("   §e- §7$constant", false)
         }
-        //#endif
     }
 
     /**
@@ -344,9 +334,7 @@ class RepoManager(private val configLocation: File) {
         with(config.location) {
             if (user == defaultUser && name == defaultName && branch == defaultBranch) {
                 if (manual) {
-                    //#if FORGE
                     ChatUtils.chat("Repo settings are already on default!")
-                    //#endif
                 }
                 return
             }
@@ -355,7 +343,6 @@ class RepoManager(private val configLocation: File) {
             name = defaultName
             branch = defaultBranch
             if (manual) {
-                //#if FORGE
                 ChatUtils.clickableChat(
                     "Reset Repo settings to default. " +
                         "Click §aUpdate Repo Now §ein config or run /shupdaterepo to update!",
@@ -364,16 +351,13 @@ class RepoManager(private val configLocation: File) {
                     },
                     "§eClick to update the repo!",
                 )
-                //#endif
             }
         }
     }
 
     private fun checkRepoLocation() {
         if (config.location.user.isEmpty() || config.location.name.isEmpty() || config.location.branch.isEmpty()) {
-            //#if FORGE
             ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
-            //#endif
             resetRepositoryLocation()
         }
     }

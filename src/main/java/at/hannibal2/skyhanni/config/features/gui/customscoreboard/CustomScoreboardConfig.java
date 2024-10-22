@@ -41,12 +41,10 @@ public class CustomScoreboardConfig {
         scoreboardEntries.addAll(ScoreboardElement.defaultOption);
     };
 
-    //#if FORGE
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
     @Accordion
     public DisplayConfig display = new DisplayConfig();
-    //#endif
 
     @Expose
     @ConfigOption(name = "Background Options", desc = "")

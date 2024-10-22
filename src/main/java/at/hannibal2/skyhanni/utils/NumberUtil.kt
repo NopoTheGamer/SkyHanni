@@ -222,30 +222,22 @@ object NumberUtil {
         formatDoubleOrNull()?.toFloat() ?: throw NumberFormatException("formatFloat failed for '$this'")
 
     fun String.formatDoubleOrUserError(): Double? = formatDoubleOrNull() ?: run {
-        //#if FORGE
         ChatUtils.userError("Not a valid number: '$this'")
-        //#endif
         return@run null
     }
 
     fun String.formatLongOrUserError(): Long? = formatDoubleOrNull()?.toLong() ?: run {
-        //#if FORGE
         ChatUtils.userError("Not a valid number: '$this'")
-        //#endif
         return@run null
     }
 
     fun String.formatIntOrUserError(): Int? = formatDoubleOrNull()?.toInt() ?: run {
-        //#if FORGE
         ChatUtils.userError("Not a valid number: '$this'")
-        //#endif
         return@run null
     }
 
     fun String.formatFloatOrUserError(): Float? = formatDoubleOrNull()?.toFloat() ?: run {
-        //#if FORGE
         ChatUtils.userError("Not a valid number: '$this'")
-        //#endif
         return@run null
     }
 

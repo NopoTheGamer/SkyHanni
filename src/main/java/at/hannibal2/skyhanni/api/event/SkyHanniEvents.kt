@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if FORGE
-import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+//#if FORGE
+import at.hannibal2.skyhanni.data.MinecraftData
 //#endif
 import java.lang.reflect.Method
 
@@ -48,7 +48,6 @@ object SkyHanniEvents {
             .addListener(method, instance, options)
     }
 
-    //#if FORGE
     @HandleEvent
     fun onRepoLoad(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
@@ -56,6 +55,7 @@ object SkyHanniEvents {
         disabledHandlerInvokers = data.disabledInvokers
     }
 
+    //#if FORGE
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Events")

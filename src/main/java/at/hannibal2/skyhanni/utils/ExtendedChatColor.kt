@@ -28,9 +28,7 @@ class ExtendedChatColor(
                 val extendedChatColor = ExtendedChatColor(color, false)
                 string.append("$extendedChatColor§m ")
             }
-            //#if FORGE
             ChatUtils.chat(string.toString())
-            //#endif
         }
     }
 }
