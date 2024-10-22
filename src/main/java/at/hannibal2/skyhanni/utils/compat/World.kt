@@ -36,22 +36,21 @@ fun Minecraft.isOnMainThread() =
 //$$ this.isSameThread
 //#endif
 
-//#if FORGE
 fun IChatComponent.getFormattedTextCompat() =
-
+//#if FORGE
     this.formattedText
-
-/*//$$     run {
-//$$         val sb = StringBuilder()
-//$$         for (component in iterator()) {
-//$$             sb.append(component.style.formattingCode)
-//$$             sb.append(component.unformattedComponentText)
+//#else
+//$$     run {
+//$$         val sb = StringBuilder() //todo this only works on some chat message
+//$$         for (component in siblings) {
+//$$             sb.append(component.string)
 //$$             sb.append("§r")
 //$$         }
 //$$         sb.toString()
 //$$     }
-////////#endif */
+//#endif
 
+//#if FORGE
 object Effects {
     val invisibility =
 

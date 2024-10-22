@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+//#if FORGE
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.command
@@ -15,9 +16,10 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.url
+import net.minecraft.util.ChatComponentText
+//#endif
 import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import java.util.LinkedList
@@ -90,10 +92,18 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ): Boolean {
+        //#if FORGE
         val text = ChatComponentText(message)
+        //#else
+        //$$ val text = Text.of(message)
+        //#endif
 
         return if (replaceSameMessage) {
+            //#if FORGE
             text.send(getUniqueMessageIdForString(message))
+            //#else
+            //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(Text.of(message))
+            //#endif
             chat(text, false)
         } else {
             chat(text)
@@ -116,7 +126,11 @@ object ChatUtils {
             return false
         }
 
+        //#if FORGE
         if (send) thePlayer.addChatMessage(message)
+        //#else
+        //$$ if (send) thePlayer.sendMessage(message)
+        //#endif
         return true
     }
 
@@ -145,12 +159,20 @@ object ChatUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
         val rawText = msgPrefix + message
+        //#if FORGE
         val text = Text.text(rawText) {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
+        //#else
+        //$$ val text = Text.of(rawText)
+        //#endif
         if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(rawText))
+            //#if FORGE
+            text.send(getUniqueMessageIdForString(message))
+            //#else
+            //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(Text.of(message))
+            //#endif
         } else {
             chat(text)
         }
@@ -182,7 +204,7 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-
+        //#if FORGE
         chat(
             Text.text(msgPrefix + message) {
                 this.hover = Text.multiline(hover)
@@ -191,6 +213,9 @@ object ChatUtils {
                 }
             }
         )
+        //#else
+        //$$ chat(Text.of(msgPrefix + message))
+        //#endif
     }
 
     /**
@@ -213,12 +238,16 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
+        //#if FORGE
         chat(
             Text.text(msgPrefix + message) {
                 this.url = url
                 this.hover = "$prefixColor$hover".asComponent()
             }
         )
+        //#else
+        //$$ chat(Text.of(msgPrefix + message))
+        //#endif
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
@@ -230,6 +259,7 @@ object ChatUtils {
      *
      * @see CHAT_PREFIX
      */
+    //#if FORGE
     fun multiComponentMessage(
         components: List<ChatComponentText>,
         prefix: Boolean = true,
@@ -238,6 +268,7 @@ object ChatUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(Text.join(components).prefix(msgPrefix))
     }
+    //#endif
 
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
@@ -254,7 +285,11 @@ object ChatUtils {
             return
         }
         if (lastMessageSent.passedSince() > messageDelay) {
+            //#if FORGE
             player.sendChatMessage(sendQueue.poll() ?: return)
+            //#else
+            //$ player.sendMessage(Text.of(sendQueue.poll() ?: return))
+            //#endif
             lastMessageSent = SimpleTimeMark.now()
         }
     }
@@ -290,23 +325,29 @@ object ChatUtils {
         )
     }
 
+    //#if FORGE
     fun IChatComponent.changeColor(color: LorenzColor): IChatComponent {
         chatStyle = ChatStyle().also {
             it.color = color.toChatFormatting()
         }
         return this
     }
+    //#endif
 
 
     fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
         clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
+                //#if FORGE
                 if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
                     option.jumpToEditor()
                 } else {
                     action()
                 }
+                //#else
+                //$$ action()
+                //#endif
             },
             hover = "§eClick to $actionName!\n" +
                 "§eShift-Click or Control-Click to disable this feature!",
