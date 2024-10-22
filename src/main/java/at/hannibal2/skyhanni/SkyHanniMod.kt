@@ -152,7 +152,6 @@ class SkyHanniMod {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        //println("Skyhanni Tick Event!!")
         //#if FORGE
         screenToOpen?.let {
             screenTicks++
@@ -165,11 +164,6 @@ class SkyHanniMod {
             }
         }
         //#endif
-    }
-
-    @HandleEvent
-    fun onWorld(event: WorldChangeEvent) {
-        println("World Change Event!!")
     }
 
     companion object {
