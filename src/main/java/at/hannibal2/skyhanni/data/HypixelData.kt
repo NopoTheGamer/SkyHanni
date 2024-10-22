@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -15,12 +14,19 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+//#if FORGE
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+//#else
+//$$ import net.minecraft.scoreboard.ScoreboardDisplaySlot
+//$$ import net.minecraft.util.Formatting
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
@@ -32,7 +38,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
@@ -191,6 +196,7 @@ object HypixelData {
         )
     }
 
+    //#if FORGE
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Server ID")
@@ -216,6 +222,7 @@ object HypixelData {
             }
         }
     }
+    //#endif
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
@@ -224,9 +231,12 @@ object HypixelData {
             playerAmountCoopPattern,
             playerAmountGuestingPattern,
         )
+        //#if FORGE
         if (DungeonAPI.inDungeon()) {
             playerPatternList.add(dungeonPartyAmountPattern)
         }
+        //#endif
+
 
         out@ for (pattern in playerPatternList) {
             for (line in TabListData.getTabList()) {
@@ -331,7 +341,9 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            //#if FORGE
             ProfileStorageData.profileJoinMessage()
+            //#endif
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
@@ -342,7 +354,9 @@ object HypixelData {
         TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
+            //#if FORGE
             if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+            //#endif
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
@@ -360,7 +374,11 @@ object HypixelData {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
+                    //#if FORGE
                     val area = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    //#else
+                    //$$ val area = originalLocation
+                    //#endif
                     skyBlockAreaWithSymbol = line.trim()
                     if (area != skyBlockArea) {
                         val previousArea = skyBlockArea
@@ -403,10 +421,12 @@ object HypixelData {
     private fun checkNEULocraw() {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
+            //#if FORGE
             thread(start = true) {
                 Thread.sleep(1000)
                 NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
             }
+            //#endif
         }
     }
 
@@ -435,7 +455,11 @@ object HypixelData {
 
         var hypixel = false
 
+        //#if FORGE
         player.clientBrand?.let {
+        //#else
+        //$$ MinecraftClient.getInstance().networkHandler?.brand?.let {
+        //#endif
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
@@ -466,9 +490,11 @@ object HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
+            //#if FORGE
             if (BingoAPI.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
+            //#endif
             when (line) {
                 " §7♲ §7Ironman" -> {
                     ironman = true
@@ -504,7 +530,9 @@ object HypixelData {
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).post()
             if (islandType == IslandType.UNKNOWN) {
+                //#if FORGE
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
+                //#endif
                 loggerIslandChange.log("Unknown: '$foundIsland'")
             } else {
                 loggerIslandChange.log(islandType.name)
@@ -529,9 +557,17 @@ object HypixelData {
         val minecraft = Minecraft.getMinecraft()
         val world = minecraft.theWorld ?: return false
 
+        //#if FORGE
         val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
+        //#else
+        //$$ val objective = world.scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return false
+        //#endif
         val displayName = objective.displayName
+        //#if FORGE
         val scoreboardTitle = displayName.removeColor()
+        //#else
+        //$$ val scoreboardTitle = Formatting.strip(displayName.string)
+        //#endif
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.data.repo.RepoManager
 //#if FORGE
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -129,6 +129,7 @@ class SkyHanniMod {
         )
         //#if FORGE
         initLogging()
+        //#endif
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
@@ -137,7 +138,6 @@ class SkyHanniMod {
             Exception("Error reading repo data", e).printStackTrace()
         }
         loadedClasses.clear()
-        //#endif
     }
 
     private val loadedClasses = mutableSetOf<String>()
@@ -182,6 +182,8 @@ class SkyHanniMod {
         val modules: MutableList<Any> = ArrayList()
         @JvmField
         var feature: Features = Features()
+        lateinit var repo: RepoManager
+
         //#if FABRIC
         //$$ var config: ManagedConfig<Features>? = null
         //#endif
@@ -213,7 +215,6 @@ class SkyHanniMod {
         lateinit var jacobContestsData: JacobContestsJson
 
         lateinit var visualWordsData: VisualWordsJson
-        lateinit var repo: RepoManager
 
         var screenToOpen: GuiScreen? = null
         private var screenTicks = 0

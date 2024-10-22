@@ -15,8 +15,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+//#if FORGE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
+//#endif
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
@@ -59,7 +61,12 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    private val insideTest = Launch.blackboard == null
+    private val insideTest =
+    //#if FORGE
+        Launch.blackboard == null
+    //#else
+    //$$ false
+    //#endif
 
     var inTestDuplicateUsage = true
 
@@ -265,10 +272,12 @@ object RepoPatternManager {
         if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         dump(sourceLabel, File(path))
+        //#if FORGE
         if (System.getenv("SKYHANNI_DUMP_REGEXES_EXIT") != null) {
             logger.info("Exiting after dumping RepoPattern regex patterns to $path")
             FMLCommonHandler.instance().exitJava(0, false)
         }
+        //#endif
     }
 
     fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {

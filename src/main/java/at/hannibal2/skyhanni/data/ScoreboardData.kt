@@ -5,16 +5,27 @@ import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.client.Minecraft
+//#if FORGE
+import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
+//#endif
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.findAll
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraft.client.Minecraft
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
+//#if FABRIC
+//$$ import net.minecraft.scoreboard.ScoreboardDisplaySlot
+//$$ import net.minecraft.scoreboard.ScoreboardEntry
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.util.Formatting
+//$$ import net.minecraft.network.packet.s2c.play.TeamS2CPacket
+//$$ import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket
+//#endif
 
 @SkyHanniModule
 object ScoreboardData {
@@ -23,7 +34,12 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
+    val objectiveTitle: String get()
+    //#if FORGE
+    = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
+    //#else
+    //$$ = MinecraftClient.getInstance().world?.scoreboard?.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR)?.displayName?.literalString ?: ""
+    //#endif
 
     private var dirty = false
 
@@ -65,12 +81,21 @@ object ScoreboardData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
+        //#if FORGE
         if (event.packet is S3CPacketUpdateScore) {
             if (event.packet.objectiveName == "update") {
                 dirty = true
                 monitor()
             }
         }
+        //#else
+        //$$ if (event.packet is ScoreboardObjectiveUpdateS2CPacket) {
+        //$$             if (event.packet.name == "update") {
+        //$$                 dirty = true
+        //$$                 monitor()
+        //$$             }
+        //$$         }
+        //#endif
         if (event.packet is S3EPacketTeams) {
             if (event.packet.name.startsWith("team_")) {
                 dirty = true
@@ -113,37 +138,68 @@ object ScoreboardData {
 
         sidebarLinesRaw = list
         val new = formatLines(list)
+        //#if FORGE
         if (new != sidebarLinesFormatted) {
             ScoreboardUpdateEvent(new).post()
             sidebarLinesFormatted = new
         }
+        //#else
+        //$$ ScoreboardUpdateEvent(new).post()
+        //$$              sidebarLinesFormatted = new
+        //#endif
     }
 
+    //#if FORGE
     fun toggleMonitor() {
         monitor = !monitor
         val action = if (monitor) "Enabled" else "Disabled"
         ChatUtils.chat("$action scoreboard monitoring in the console.")
 
     }
+    //#endif
 
     private fun cleanSB(scoreboard: String): String {
         return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
     }
 
     private fun fetchScoreboardLines(): List<String> {
+        //#if FORGE
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")
         }
+        //#else
+        //$$ val scoreboard = MinecraftClient.getInstance().world?.scoreboard ?: return emptyList()
+        //$$         val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
+        //$$         var scores = scoreboard.getScoreboardEntries(objective)
+        //$$         val list = scores.sortedBy { -it.value }
+        //$$             .map {
+        //$$                 val team = scoreboard.getScoreHolderTeam(it.owner)
+        //$$                 Text.empty().also { main ->
+        //$$                     team?.prefix?.apply { siblings.forEach { sibling -> main.append(sibling) } }
+        //$$                     team?.suffix?.apply { siblings.forEach { sibling -> main.append(sibling) } }
+        //$$                 }
+        //$$             }
+        //#endif
+        //#if FORGE
         scores = if (list.size > 15) {
             list.drop(15)
         } else {
             list
         }
+        //#endif
+        //#if FORGE
         return scores.map {
+        //#else
+        //$$ return list.map {
+        //#endif
+            //#if FORGE
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
+            //#else
+            //$$ Formatting.strip(it.string) ?: ""
+            //#endif
         }
     }
 
