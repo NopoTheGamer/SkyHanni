@@ -1,24 +1,23 @@
 package at.hannibal2.skyhanni
 
-
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
-import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
-import at.hannibal2.skyhanni.events.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.WorldChangeEvent
-import at.hannibal2.skyhanni.config.Features
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.events.KeyPressEvent
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
+import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 //#if FORGE
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -37,7 +36,6 @@ import net.minecraft.client.gui.GuiScreen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import org.lwjgl.input.Keyboard
 //#if FABRIC
 //$$ import net.fabricmc.api.ModInitializer;
 //$$ import io.github.notenoughupdates.moulconfig.managed.ManagedConfig
@@ -163,20 +161,29 @@ class SkyHanniMod {
         @JvmStatic
         val version: String get() = "@MOD_VERSION@"
 
-        val modules: MutableList<Any> = ArrayList()
         @JvmField
         var feature: Features = Features()
-        lateinit var repo: RepoManager
+        lateinit var friendsData: FriendsJson
+        lateinit var knownFeaturesData: KnownFeaturesJson
+        lateinit var visualWordsData: VisualWordsJson
 
-        //#if FABRIC
-        //$$ var config: ManagedConfig<Features>? = null
-        //#endif
+        lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
+        fun getLogger(name: String): Logger {
+            return LogManager.getLogger("SkyHanni.$name")
+        }
+
+        val modules: MutableList<Any> = ArrayList()
         private val globalJob: Job = Job(null)
         val coroutineScope = CoroutineScope(
             CoroutineName("SkyHanni") + SupervisorJob(globalJob),
         )
+
+        fun consoleLog(message: String) {
+            logger.log(Level.INFO, message)
+        }
+
         fun launchCoroutine(function: suspend () -> Unit) {
             coroutineScope.launch {
                 try {
@@ -186,15 +193,7 @@ class SkyHanniMod {
                 }
             }
         }
-        fun consoleLog(message: String) {
-            logger.log(Level.INFO, message)
-        }
-        fun getLogger(name: String): Logger {
-            return LogManager.getLogger("SkyHanni.$name")
-        }
-        lateinit var friendsData: FriendsJson
-        lateinit var knownFeaturesData: KnownFeaturesJson
-        lateinit var visualWordsData: VisualWordsJson
+
         //#if FORGE
         lateinit var sackData: SackData
 
@@ -202,6 +201,8 @@ class SkyHanniMod {
 
         var screenToOpen: GuiScreen? = null
         private var screenTicks = 0
+        //#elseif FABRIC
+        //$$ var config: ManagedConfig<Features>? = null
         //#endif
     }
 }
