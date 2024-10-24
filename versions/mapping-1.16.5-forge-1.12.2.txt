@@ -12,14 +12,23 @@ net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
 
 net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
 
-net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
-net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiContainer
+
+net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
+net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 
 net.minecraft.client.Minecraft submit() addScheduledTask()
 
 net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
 net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
+
+net.minecraft.client.multiplayer.PlayerInfo net.minecraft.client.network.NetworkPlayerInfo
+net.minecraft.client.multiplayer.PlayerInfo getTeam() getPlayerTeam()
+net.minecraft.client.multiplayer.PlayerInfo getGameMode() getGameType()
+net.minecraft.client.multiplayer.PlayerInfo getProfile() getGameProfile()
+
 net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.NetHandlerPlayClient
 
 net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
@@ -42,6 +51,20 @@ net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
 net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
+net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
+net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
+
+net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
+net.minecraft.nbt.CompoundTag getList() getTagList()
+net.minecraft.nbt.CompoundTag put() setTag()
+net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
+net.minecraft.nbt.CompoundTag putInt() setInteger()
+net.minecraft.nbt.CompoundTag putString() setString()
+net.minecraft.nbt.CompoundTag remove() removeTag()
+
+net.minecraft.nbt.ListTag getString() getStringTagAt()
+
+net.minecraft.nbt.ListTag getSize() tagCount()
 
 net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
 
@@ -68,21 +91,27 @@ net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecra
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
 net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.SPacketTeams
 net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.SPacketUpdateScore
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.SPacketTitle
 net.minecraft.network.protocol.game.ClientboundSoundPacket net.minecraft.network.play.server.SPacketSoundEffect
 net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
 net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket net.minecraft.network.play.server.SPacketCollectItem
 net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
 net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
 net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
-net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.SPacketTitle
+
+net.minecraft.network.protocol.game.ClientboundAddEntityPacket getId() getEntityID()
 
 net.minecraft.network.protocol.game.ClientboundAddMobPacket getId() getEntityID()
 
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket getEntityId() getEntityID()
 
+net.minecraft.network.protocol.game.ClientboundAnimatePacket getId() getEntityID()
+
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
 
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getContainerId() getWindowId()
+
+net.minecraft.network.protocol.game.ClientboundLevelEventPacket getPos() getSoundPos()
 
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getX() getXCoordinate()
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getY() getYCoordinate()
@@ -95,6 +124,18 @@ net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZDist() g
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket isOverrideLimiter() isLongDistance()
 
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket getEntityIds() getEntityIDs()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket getSourceId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket getEntity() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket getText() getMessage()
 
 net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.CPacketClickWindow
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
@@ -142,11 +183,14 @@ net.minecraft.world.entity.player.Inventory net.minecraft.entity.player.Inventor
 
 net.minecraft.world.entity.player.Inventory armor armorInventory
 net.minecraft.world.entity.player.Inventory items mainInventory
+net.minecraft.world.entity.player.Inventory getCarried() getItemStack()
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
 net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
 
 net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
+
+net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
 
 net.minecraft.world.entity.projectile.FishingHook net.minecraft.entity.projectile.EntityFishHook
 
@@ -163,6 +207,9 @@ net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBloc
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
 
 net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
+
+net.minecraftforge.api.distmarker.Dist net.minecraftforge.fml.relauncher.Side
+net.minecraftforge.api.distmarker.OnlyIn net.minecraftforge.fml.relauncher.SideOnly
 
 net.minecraftforge.event.TickEvent net.minecraftforge.fml.common.gameevent.TickEvent
 
@@ -206,7 +253,7 @@ org.lwjgl.glfw.GLFW GLFW_KEY_T KEY_T
 org.lwjgl.glfw.GLFW GLFW_KEY_U KEY_U
 org.lwjgl.glfw.GLFW GLFW_KEY_V KEY_V
 org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
-org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_X
+org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_CONTROL KEY_LCONTROL
@@ -218,3 +265,11 @@ org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_SHIFT KEY_RSHIFT
 org.lwjgl.glfw.GLFW GLFW_KEY_SPACE KEY_SPACE
 org.lwjgl.glfw.GLFW GLFW_KEY_TAB KEY_TAB
 org.lwjgl.glfw.GLFW GLFW_KEY_UNKNOWN KEY_NONE
+org.lwjgl.glfw.GLFW GLFW_KEY_F3 KEY_F3
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT KEY_LEFT
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT KEY_RIGHT
+org.lwjgl.glfw.GLFW GLFW_KEY_UP KEY_UP
+org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
+org.lwjgl.glfw.GLFW GLFW_KEY_ENTER KEY_RETURN
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
