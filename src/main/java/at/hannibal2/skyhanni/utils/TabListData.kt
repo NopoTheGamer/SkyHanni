@@ -7,19 +7,20 @@ import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-//#if FORGE
-import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+//#if MC<1.12
+import net.minecraft.world.WorldSettings
+//#else
+//$$ import net.minecraft.world.GameType
+//#endif
+//#if FORGE
+import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
+import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
 //#else
 //$$ import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket
-//$$ import net.fabricmc.api.EnvType
-//$$ import net.fabricmc.api.Environment
 //$$ import net.minecraft.util.Formatting
-//$$ import net.minecraft.world.GameMode
-//$$ import net.minecraft.client.network.PlayerListEntry
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
@@ -30,7 +31,6 @@ import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraft.world.WorldSettings
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -93,22 +93,20 @@ object TabListData {
 
     private val playerOrdering = Ordering.from(PlayerComparator())
 
-    //#if FORGE
     @SideOnly(Side.CLIENT)
     internal class PlayerComparator : Comparator<NetworkPlayerInfo> {
-    //#else
-    //$$ @Environment(EnvType.CLIENT)
-    //$$ internal class PlayerComparator : Comparator<PlayerListEntry> {
-    //#endif
 
-
-        //#if FORGE
         override fun compare(o1: NetworkPlayerInfo, o2: NetworkPlayerInfo): Int {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
+                //#if MC<1.12
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR
+                //#else
+                //$$ o1.gameType != GameType.SPECTATOR,
+                //$$ o2.gameType != GameType.SPECTATOR
+                //#endif
             )
                 .compare(
                     if (team1 != null) team1.registeredName else "",
@@ -116,30 +114,15 @@ object TabListData {
                 )
                 .compare(o1.gameProfile.name, o2.gameProfile.name).result()
         }
-        //#else
-        //$$ override fun compare(o1: PlayerListEntry, o2: PlayerListEntry): Int {
-        //$$              val team1 = o1.scoreboardTeam
-        //$$              val team2 = o2.scoreboardTeam
-        //$$              return ComparisonChain.start().compareTrueFirst(
-        //$$                  o1.gameMode != GameMode.SPECTATOR,
-        //$$                  o2.gameMode != GameMode.SPECTATOR
-        //$$              )
-        //$$                  .compare(
-        //$$                      if (team1 != null) team1.name else "",
-        //$$                      if (team2 != null) team2.name else ""
-        //$$                  )
-        //$$                  .compare(o1.profile.name, o2.profile.name).result()
-        //$$          }
-        //#endif
     }
 
     private fun readTabList(): List<String>? {
         val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
-        //#if FORGE
+        //#if MC<1.16
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
         tabListGuard = true
         //#else
-        //$$ val players = playerOrdering.sortedCopy(thePlayer.networkHandler.playerList)
+        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
         //#endif
         val result = mutableListOf<String>()
         for (info in players) {
@@ -147,7 +130,7 @@ object TabListData {
             //#if FORGE
             result.add(LorenzUtils.stripVanillaMessage(name))
             //#else
-            //$$ result.add(LorenzUtils.stripVanillaMessage(Formatting.strip(name.string) ?: ""))
+            //$$ result.add(LorenzUtils.stripVanillaMessage(Formatting.strip(name.string) ?: "")) //todo colour codes
             //#endif
         }
         //#if FORGE
@@ -166,7 +149,7 @@ object TabListData {
         }
         //#else
         //$$ if (event.packet is PlayerListHeaderS2CPacket) {
-        //$$              var footer = Formatting.strip(event.packet.footer.string) ?: ""
+        //$$              var footer = Formatting.strip(event.packet.footer.string) ?: "" //todo colour codes
         //$$              if (footer != this.footer && footer != "") {
         //$$                  TablistFooterUpdateEvent(footer).post()
         //$$              }
