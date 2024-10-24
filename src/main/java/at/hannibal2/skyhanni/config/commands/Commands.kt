@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.event.HandleEvent
+//#if FORGE
+import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
@@ -79,7 +80,6 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
@@ -100,15 +100,18 @@ import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
+//#endif
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.TabListData
 
 @SkyHanniModule
 object Commands {
 
     val commands = mutableListOf<CommandBuilder>()
 
+    //#if FORGE
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         usersMain(event)
@@ -831,4 +834,5 @@ object Commands {
             callback { PartyCommands.reverseTransfer() }
         }
     }
+    //#endif
 }

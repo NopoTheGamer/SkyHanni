@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+//#if FORGE
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
+//#endif
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
@@ -88,7 +90,9 @@ object ConfigUpdaterMigrator {
                 return
             }
             movesPerformed++
+            //#if FORGE
             if (np == listOf("#player", "personalBest")) LimboTimeTracker.workaroundMigration(oldElem.asInt)
+            //#endif
             newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))
             logger.log("Moved element from $oldPath to $newPath")
         }

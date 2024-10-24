@@ -14,17 +14,17 @@ import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.data.repo.RepoManager
-//#if FORGE
-import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#if FORGE
+import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 //#endif
 import kotlinx.coroutines.CoroutineName
@@ -81,14 +81,6 @@ class SkyHanniMod {
     //$$     config = ManagedConfig.create(File("config/skyhanni/config.json"), Features::class.java)
     //$$         ClientCommandRegistrationCallback.EVENT.register { a, b ->
     //$$             a.register(
-    //$$                 literal("sh").executes {
-    //$$                     MinecraftClient.getInstance().send {
-    //$$                         if (config != null) config!!.openConfigGui()
-    //$$                     }
-    //$$                     0
-    //$$                 }
-    //$$             )
-    //$$             a.register(
     //$$                 literal("update").executes {
     //$$                     UpdateManager.updateCommand(arrayOf(""))
     //$$                     0
@@ -114,9 +106,9 @@ class SkyHanniMod {
         loadModule(CrimsonIsleReputationHelper(this))
 
 
-        CommandRegistrationEvent.post()
 
         //#endif
+        CommandRegistrationEvent.post()
         PreInitFinishedEvent.post()
     }
 
@@ -127,9 +119,7 @@ class SkyHanniMod {
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        //#if FORGE
         initLogging()
-        //#endif
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
@@ -202,13 +192,13 @@ class SkyHanniMod {
         fun getLogger(name: String): Logger {
             return LogManager.getLogger("SkyHanni.$name")
         }
-        //#if FORGE
-        lateinit var sackData: SackData
         lateinit var friendsData: FriendsJson
         lateinit var knownFeaturesData: KnownFeaturesJson
-        lateinit var jacobContestsData: JacobContestsJson
-
         lateinit var visualWordsData: VisualWordsJson
+        //#if FORGE
+        lateinit var sackData: SackData
+
+        lateinit var jacobContestsData: JacobContestsJson
 
         var screenToOpen: GuiScreen? = null
         private var screenTicks = 0

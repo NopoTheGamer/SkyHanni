@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 //#if FORGE
 import at.hannibal2.skyhanni.data.GuiEditManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+//#else
+//$$ import net.minecraft.client.MinecraftClient
 //#endif
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
@@ -21,6 +23,13 @@ object ConfigGuiManager {
             editor.search(search)
         }
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        //#else
+        //$$ MinecraftClient.getInstance().send {
+        //$$    if (SkyHanniMod.config != null) {
+        //$$        if (search != null) SkyHanniMod.config!!.getEditor().search(search)
+        //$$        SkyHanniMod.config!!.openConfigGui()
+        //$$    }
+        //$$ }
         //#endif
     }
 
