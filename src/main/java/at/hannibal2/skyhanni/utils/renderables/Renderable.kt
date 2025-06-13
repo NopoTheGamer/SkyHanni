@@ -818,7 +818,8 @@ interface Renderable {
                     val (uMax, vMax) = Pair(uMin + (width * scale), vMin + (height * scale))
 
                     //#if MC < 1.21
-                    GuiRenderUtils.drawTexturedRect(posX, posY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
+                    GuiRenderUtils.drawTexturedRect(
+                        posX, posY, width, height, uMin, uMax, vMin, vMax, createResourceLocation(texture.path),
                         alpha = 1f, filter = GL11.GL_NEAREST
                     )
                     //#else
@@ -830,7 +831,8 @@ interface Renderable {
                         GlStateManager.color(1f, 1f, 1f, 1f)
                         //#if MC < 1.21
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
-                        GuiRenderUtils.drawTexturedRect(posX, posY, progress, height, uMin, uMin + (progress * scale),
+                        GuiRenderUtils.drawTexturedRect(
+                            posX, posY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
                             alpha = 1f, filter = GL11.GL_NEAREST
                         )
@@ -841,7 +843,8 @@ interface Renderable {
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                         //#if MC < 1.21
-                        GuiRenderUtils.drawTexturedRect(posX, posY, progress, height, uMin, uMin + (progress * scale),
+                        GuiRenderUtils.drawTexturedRect(
+                            posX, posY, progress, height, uMin, uMin + (progress * scale),
                             vMin + (height * scale), vMin + (2 * height * scale), createResourceLocation(texture.path),
                             alpha = 1f, filter = GL11.GL_NEAREST
                         )
