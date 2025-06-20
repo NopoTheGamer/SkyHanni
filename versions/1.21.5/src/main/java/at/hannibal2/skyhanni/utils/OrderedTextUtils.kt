@@ -13,83 +13,113 @@ import kotlin.time.Duration.Companion.minutes
 object OrderedTextUtils {
     private val textToLegacyCache = TimeLimitedCache<OrderedText, String>(5.minutes)
     private val CHROMA_COLOR = TextColor(0xFFFFFF, "chroma")
+
     @JvmStatic
     fun orderedTextToLegacyString(orderedText: OrderedText?): String {
+
         orderedText ?: return ""
+
         return textToLegacyCache.getOrPut(orderedText) {
+
             val sb = StringBuilder()
             var lastStyle = Style.EMPTY
+
             orderedText.accept { index, style, codePoint ->
+
                 if (lastStyle != style) {
                     sb.append(requiredStyleChangeString(lastStyle, style, true))
                     lastStyle = style
                 }
+
                 sb.append(codePoint.toChar())
                 true
             }
+
             return sb.toString().removeSuffix("§r").removePrefix("§r")
         }
     }
+
     @JvmStatic
     fun stringVisitableToLegacyString(stringVisitable: StringVisitable): String {
+
         val sb = StringBuilder()
         var lastStyle = Style.EMPTY
+
         stringVisitable.visit({ style, string ->
+
             if (lastStyle != style) {
                 sb.append(requiredStyleChangeString(lastStyle, style))
                 lastStyle = style
             }
+
             sb.append(string)
+
             Optional.empty<Any>()
         }, Style.EMPTY)
+
         return sb.toString()
     }
+
     @JvmStatic
     fun legacyStringToStringVisitable(legacyString: String): StringVisitable {
+
         val segments = mutableListOf<StringVisitable>()
         var lastStyle = Style.EMPTY
         var wasLastStyle = false
         val sb = StringBuilder()
+
         for (char in legacyString) {
+
             if (char == '§') {
                 wasLastStyle = true
             } else if (wasLastStyle) {
+
                 if (sb.isNotEmpty()) {
                     segments.add(StringVisitable.styled(sb.toString(), lastStyle))
                     sb.clear()
                 }
+
                 val formatting = Formatting.byCode(char)
                 if (formatting != null) {
                     lastStyle = lastStyle.withExclusiveFormatting(formatting)
                 } else if (char == 'z') {
                     lastStyle = lastStyle.withColor(CHROMA_COLOR)
                 }
+
                 wasLastStyle = false
             } else {
                 sb.append(char)
             }
         }
+
         if (sb.isNotEmpty()) {
             segments.add(StringVisitable.styled(sb.toString(), lastStyle))
             sb.clear()
         }
+
         return StringVisitable.concat(segments)
     }
+
     @JvmStatic
     fun legacyTextToOrderedText(legacyString: String?): OrderedText {
+
         return OrderedText { visitor ->
             var lastStyle = Style.EMPTY
             var wasLastStyle = false
+
             for (char in legacyString ?: "") {
+
                 if (char == '§') {
                     wasLastStyle = true
                 } else if (wasLastStyle) {
+
                     val formatting = Formatting.byCode(char)
                     if (formatting != null) {
                         lastStyle = lastStyle.withExclusiveFormatting(formatting)
                     } else if (char == 'z') {
                         lastStyle = lastStyle.withColor(CHROMA_COLOR)
                     }
+
                     wasLastStyle = false
                 } else {
                     visitor.accept(0, lastStyle, char.code)
@@ -98,6 +128,7 @@ object OrderedTextUtils {
             true
         }
     }
+
     private fun requiredStyleChangeString(from: Style, to: Style, exclusive: Boolean = false): String {
         val reset = (
             from.isBold && !to.isBold ||
@@ -113,6 +144,7 @@ object OrderedTextUtils {
 
         if (from.color != to.color && to.color != null) {
             if (!exclusive) sb.append(Formatting.RESET.toString())
+
             if (to.color?.name == "chroma") {
                 sb.append("§z")
             } else {
@@ -139,6 +171,7 @@ object OrderedTextUtils {
         if ((to.isStrikethrough && reset) || (to.isStrikethrough && !from.isStrikethrough)) {
             sb.append(Formatting.STRIKETHROUGH.toString())
         }
+
         return sb.toString()
     }
 }

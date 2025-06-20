@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(TextRenderer.class)
 public class MixinTextRenderer {
+
     @ModifyVariable(
         method = "drawInternal(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
         index = 1,
@@ -18,14 +19,17 @@ public class MixinTextRenderer {
         argsOnly = true
     )
     private OrderedText modifyOrderedText(OrderedText value) {
+        
         String replaced = ModifyVisualWords.INSTANCE.modifyText(
             OrderedTextUtils.orderedTextToLegacyString(value)
         );
+
         if (replaced == null) return value;
         return OrderedTextUtils.legacyTextToOrderedText(
             replaced
         );
     }
+
     @ModifyVariable(
         method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
         index = 1,
@@ -33,9 +37,11 @@ public class MixinTextRenderer {
         argsOnly = true
     )
     private String modifyString(String value) {
+
         String replaced = ModifyVisualWords.INSTANCE.modifyText(
             value
         );
+
         if (replaced == null) return value;
         return replaced;
     }
@@ -46,15 +52,19 @@ public class MixinTextRenderer {
         at = @At("HEAD"),
         argsOnly = true
     )
+
     private OrderedText modifyWidth(OrderedText value) {
+
         String replaced = ModifyVisualWords.INSTANCE.modifyText(
             OrderedTextUtils.orderedTextToLegacyString(value)
         );
+
         if (replaced == null) return value;
         return OrderedTextUtils.legacyTextToOrderedText(
             replaced
         );
     }
+
     @ModifyVariable(
         method = "getWidth(Ljava/lang/String;)I",
         index = 1,
@@ -62,12 +72,15 @@ public class MixinTextRenderer {
         argsOnly = true
     )
     private String modifyWidth(String value) {
+
         String replaced = ModifyVisualWords.INSTANCE.modifyText(
             value
         );
+
         if (replaced == null) return value;
         return replaced;
     }
+
     @ModifyVariable(
         method = "getWidth(Lnet/minecraft/text/StringVisitable;)I",
         index = 1,
@@ -75,9 +88,11 @@ public class MixinTextRenderer {
         argsOnly = true
     )
     private StringVisitable modifyWidth(StringVisitable value) {
+
         String replaced = ModifyVisualWords.INSTANCE.modifyText(
             OrderedTextUtils.stringVisitableToLegacyString(value)
         );
+
         if (replaced == null) return value;
         return OrderedTextUtils.legacyStringToStringVisitable(
             replaced
