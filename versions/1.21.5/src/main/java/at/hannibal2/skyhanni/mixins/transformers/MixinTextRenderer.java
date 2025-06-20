@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.utils.OrderedTextUtils;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -66,5 +67,20 @@ public class MixinTextRenderer {
         );
         if (replaced == null) return value;
         return replaced;
+    }
+    @ModifyVariable(
+        method = "getWidth(Lnet/minecraft/text/StringVisitable;)I",
+        index = 1,
+        at = @At("HEAD"),
+        argsOnly = true
+    )
+    private StringVisitable modifyWidth(StringVisitable value) {
+        String replaced = ModifyVisualWords.INSTANCE.modifyText(
+            OrderedTextUtils.stringVisitableToLegacyString(value)
+        );
+        if (replaced == null) return value;
+        return OrderedTextUtils.legacyStringToStringVisitable(
+            replaced
+        );
     }
 }

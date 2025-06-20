@@ -21,7 +21,7 @@ object OrderedTextUtils {
             var lastStyle = Style.EMPTY
             orderedText.accept { index, style, codePoint ->
                 if (lastStyle != style) {
-                    sb.append(requiredStyleChangeString(lastStyle, style))
+                    sb.append(requiredStyleChangeString(lastStyle, style, true))
                     lastStyle = style
                 }
                 sb.append(codePoint.toChar())
@@ -60,7 +60,7 @@ object OrderedTextUtils {
                 }
                 val formatting = Formatting.byCode(char)
                 if (formatting != null) {
-                    lastStyle = lastStyle.withFormatting(formatting)
+                    lastStyle = lastStyle.withExclusiveFormatting(formatting)
                 } else if (char == 'z') {
                     lastStyle = lastStyle.withColor(CHROMA_COLOR)
                 }
@@ -86,7 +86,7 @@ object OrderedTextUtils {
                 } else if (wasLastStyle) {
                     val formatting = Formatting.byCode(char)
                     if (formatting != null) {
-                        lastStyle = lastStyle.withFormatting(formatting)
+                        lastStyle = lastStyle.withExclusiveFormatting(formatting)
                     } else if (char == 'z') {
                         lastStyle = lastStyle.withColor(CHROMA_COLOR)
                     }
@@ -98,19 +98,31 @@ object OrderedTextUtils {
             true
         }
     }
-    private fun requiredStyleChangeString(from: Style, to: Style): String {
+    private fun requiredStyleChangeString(from: Style, to: Style, exclusive: Boolean = false): String {
         val reset = (
             from.isBold && !to.isBold ||
             from.isItalic && !to.isItalic ||
             from.isObfuscated && !to.isObfuscated ||
             from.isUnderlined && !to.isUnderlined ||
             from.isStrikethrough && !to.isStrikethrough ||
-            from.color != null && to.color == null
+            from.color != null && to.color == null ||
+            exclusive && (from.color != to.color)
         )
 
         val sb = StringBuilder()
 
-        if (reset) sb.append(Formatting.RESET.toString())
+        if (from.color != to.color && to.color != null) {
+            if (!exclusive) sb.append(Formatting.RESET.toString())
+            if (to.color?.name == "chroma") {
+                sb.append("§z")
+            } else {
+                to.color?.toChatFormatting() ?.let {
+                    sb.append(it.toString())
+                }
+            }
+        } else if (reset) {
+            sb.append(Formatting.RESET.toString())
+        }
 
         if ((to.isBold && reset) || (to.isBold && !from.isBold)) {
             sb.append(Formatting.BOLD.toString())
@@ -126,16 +138,6 @@ object OrderedTextUtils {
         }
         if ((to.isStrikethrough && reset) || (to.isStrikethrough && !from.isStrikethrough)) {
             sb.append(Formatting.STRIKETHROUGH.toString())
-        }
-        if (from.color != to.color && to.color != null) {
-            if (to.color?.name == "chroma") {
-                sb.append("§z")
-            } else {
-                to.color?.toChatFormatting() ?.let {
-                    sb.append(it.toString())
-                }
-            }
-
         }
         return sb.toString()
     }
