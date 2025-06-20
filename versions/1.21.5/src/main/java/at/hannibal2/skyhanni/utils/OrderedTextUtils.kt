@@ -1,27 +1,32 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Style
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
+import kotlin.time.Duration.Companion.minutes
 
 object OrderedTextUtils {
+    private val textToLegacyCache = TimeLimitedCache<OrderedText, String>(5.minutes)
     private val CHROMA_COLOR = TextColor(0xFFFFFF, "chroma")
     @JvmStatic
     fun orderedTextToLegacyString(orderedText: OrderedText?): String {
         orderedText ?: return ""
-        val sb = StringBuilder()
-        var lastStyle = Style.EMPTY
-        orderedText.accept { index, style, codePoint ->
-            if (lastStyle != style) {
-                sb.append(requiredStyleChangeString(lastStyle, style))
-                lastStyle = style
+        return textToLegacyCache.getOrPut(orderedText) {
+            val sb = StringBuilder()
+            var lastStyle = Style.EMPTY
+            orderedText.accept { index, style, codePoint ->
+                if (lastStyle != style) {
+                    sb.append(requiredStyleChangeString(lastStyle, style))
+                    lastStyle = style
+                }
+                sb.append(codePoint.toChar())
+                true
             }
-            sb.append(codePoint.toChar())
-            true
+            return sb.toString().removeSuffix("§r").removePrefix("§r")
         }
-        return sb.toString().removeSuffix("§r").removePrefix("§r")
     }
     @JvmStatic
     fun legacyTextToOrderedText(legacyString: String?): OrderedText {

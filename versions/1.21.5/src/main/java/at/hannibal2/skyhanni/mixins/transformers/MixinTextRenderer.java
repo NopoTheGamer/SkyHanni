@@ -25,4 +25,19 @@ public class MixinTextRenderer {
             replaced
         );
     }
+    @ModifyVariable(
+        method = "getWidth(Lnet/minecraft/text/OrderedText;)I",
+        index = 1,
+        at = @At("HEAD"),
+        argsOnly = true
+    )
+    private OrderedText modifyWidth(OrderedText value) {
+        String replaced = ModifyVisualWords.INSTANCE.modifyText(
+            OrderedTextUtils.orderedTextToLegacyString(value)
+        );
+        if (replaced == null) return value;
+        return OrderedTextUtils.legacyTextToOrderedText(
+            replaced
+        );
+    }
 }
