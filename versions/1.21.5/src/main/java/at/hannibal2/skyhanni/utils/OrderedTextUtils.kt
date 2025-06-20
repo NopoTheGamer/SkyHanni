@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.toChatFormatting
 import net.minecraft.text.OrderedText
+import net.minecraft.text.StringVisitable
 import net.minecraft.text.Style
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
+import java.util.Optional
 import kotlin.time.Duration.Companion.minutes
 
 object OrderedTextUtils {
@@ -27,6 +29,51 @@ object OrderedTextUtils {
             }
             return sb.toString().removeSuffix("§r").removePrefix("§r")
         }
+    }
+    @JvmStatic
+    fun stringVisitableToLegacyString(stringVisitable: StringVisitable): String {
+        val sb = StringBuilder()
+        var lastStyle = Style.EMPTY
+        stringVisitable.visit({ style, string ->
+            if (lastStyle != style) {
+                sb.append(requiredStyleChangeString(lastStyle, style))
+                lastStyle = style
+            }
+            sb.append(string)
+            Optional.empty<Any>()
+        }, Style.EMPTY)
+        return sb.toString()
+    }
+    @JvmStatic
+    fun legacyStringToStringVisitable(legacyString: String): StringVisitable {
+        val segments = mutableListOf<StringVisitable>()
+        var lastStyle = Style.EMPTY
+        var wasLastStyle = false
+        val sb = StringBuilder()
+        for (char in legacyString) {
+            if (char == '§') {
+                wasLastStyle = true
+            } else if (wasLastStyle) {
+                if (sb.isNotEmpty()) {
+                    segments.add(StringVisitable.styled(sb.toString(), lastStyle))
+                    sb.clear()
+                }
+                val formatting = Formatting.byCode(char)
+                if (formatting != null) {
+                    lastStyle = lastStyle.withFormatting(formatting)
+                } else if (char == 'z') {
+                    lastStyle = lastStyle.withColor(CHROMA_COLOR)
+                }
+                wasLastStyle = false
+            } else {
+                sb.append(char)
+            }
+        }
+        if (sb.isNotEmpty()) {
+            segments.add(StringVisitable.styled(sb.toString(), lastStyle))
+            sb.clear()
+        }
+        return StringVisitable.concat(segments)
     }
     @JvmStatic
     fun legacyTextToOrderedText(legacyString: String?): OrderedText {

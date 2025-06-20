@@ -26,6 +26,20 @@ public class MixinTextRenderer {
         );
     }
     @ModifyVariable(
+        method = "drawInternal(Ljava/lang/String;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I",
+        index = 1,
+        at = @At("HEAD"),
+        argsOnly = true
+    )
+    private String modifyString(String value) {
+        String replaced = ModifyVisualWords.INSTANCE.modifyText(
+            value
+        );
+        if (replaced == null) return value;
+        return replaced;
+    }
+
+    @ModifyVariable(
         method = "getWidth(Lnet/minecraft/text/OrderedText;)I",
         index = 1,
         at = @At("HEAD"),
@@ -39,5 +53,18 @@ public class MixinTextRenderer {
         return OrderedTextUtils.legacyTextToOrderedText(
             replaced
         );
+    }
+    @ModifyVariable(
+        method = "getWidth(Ljava/lang/String;)I",
+        index = 1,
+        at = @At("HEAD"),
+        argsOnly = true
+    )
+    private String modifyWidth(String value) {
+        String replaced = ModifyVisualWords.INSTANCE.modifyText(
+            value
+        );
+        if (replaced == null) return value;
+        return replaced;
     }
 }
