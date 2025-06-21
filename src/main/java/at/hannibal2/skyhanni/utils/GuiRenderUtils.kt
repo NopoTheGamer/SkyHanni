@@ -335,7 +335,7 @@ object GuiRenderUtils {
 
         //#if MC < 1.21
         val (hx, hy, hz) = listOf(8f, 8f, 100f)
-        val (zT, zS) = listOf( -19f, 0.2f)
+        val (zT, zS) = listOf(-19f, 0.2f)
         //#else
         //$$ val (hx, hy, hz) = listOf(8f, 8f, 148f)
         //$$ val (zT, zS) = listOf(-95f, 1f)
