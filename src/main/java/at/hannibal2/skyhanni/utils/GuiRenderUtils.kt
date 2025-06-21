@@ -335,13 +335,15 @@ object GuiRenderUtils {
 
         //#if MC < 1.21
         val (hx, hy, hz) = listOf(8f, 8f, 100f)
+        val (zT, zS) = listOf( -19f, 0.2f)
         //#else
         //$$ val (hx, hy, hz) = listOf(8f, 8f, 148f)
+        //$$ val (zT, zS) = listOf(-95f, 1f)
         //#endif
 
         DrawContextUtils.pushPop {
-            DrawContextUtils.translate(translateX, translateY, -19f)
-            DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+            DrawContextUtils.translate(translateX, translateY, zT)
+            DrawContextUtils.scale(finalScale, finalScale, zS)
 
             //#if MC < 1.21
             val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
