@@ -354,13 +354,14 @@ object GuiRenderUtils {
             }
             DrawContextUtils.multMatrix(savedMV)
             //#else
-            //$$ val rotMat = Matrix4f().identity()
-            //$$    .translate(hx, hy, hz)
-            //$$    .rotateX(Math.toRadians(rotX.toDouble()).toFloat())
-            //$$    .rotateY(Math.toRadians(rotY.toDouble()).toFloat())
-            //$$    .rotateZ(Math.toRadians(rotZ.toDouble()).toFloat())
-            //$$    .translate(-hx, -hy, -hz)
-            //$$ DrawContextUtils.multMatrix(rotMat)
+            //$$ RenderSystem.assertOnRenderThread()
+            //$$ val rotationMat = Matrix4f().identity()
+            //$$ rotationMat.translate(hx, hy, hz)
+            //$$ if (rotX != 0f) rotationMat.rotateAxis(rotX * (Math.PI.toFloat() / 180f), 1f, 0f, 0f)
+            //$$ if (rotY != 0f) rotationMat.rotateAxis(rotY * (Math.PI.toFloat() / 180f), 0f, 1f, 0f)
+            //$$ if (rotZ != 0f) rotationMat.rotateAxis(rotZ * (Math.PI.toFloat() / 180f), 0f, 0f, 1f)
+            //$$ rotationMat.translate(-hx, -hy, -hz)
+            //$$ DrawContextUtils.multMatrix(rotationMat)
             //#endif
 
             //#if MC < 1.21
@@ -371,9 +372,13 @@ object GuiRenderUtils {
             //#endif
 
             RenderHelper.enableGUIStandardItemLighting()
+
             //#if MC < 1.21
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            //#else
+            //$$ DiffuseLighting.setupGui3DDiffuseLighting()
             //#endif
+
             DrawContextUtils.drawItem(item, 0, 0)
 
             //#if MC < 1.21
