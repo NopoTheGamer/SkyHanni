@@ -142,7 +142,7 @@ object OrderedTextUtils {
 
         val sb = StringBuilder()
 
-        if (from.color != to.color && to.color != null) {
+        if ((from.color != to.color && to.color != null) || (reset && to.color != null)) {
             if (!exclusive) sb.append(Formatting.RESET.toString())
 
             if (to.color?.name == "chroma") {
