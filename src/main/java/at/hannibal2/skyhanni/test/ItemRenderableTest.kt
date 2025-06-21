@@ -19,20 +19,21 @@ object ItemRenderableTest {
     private val config get() = SkyHanniMod.feature.dev.debug
     private val BOX_OF_SEEDS_ITEM = "BOX_OF_SEEDS".toInternalName()
     private val itemStackRenderable by lazy {
-        ItemStackRenderable(BOX_OF_SEEDS_ITEM.getItemStack())
+        ItemStackRenderable(BOX_OF_SEEDS_ITEM.getItemStack(), scale = 4.0)
     }
     private val animatedItemStackRenderable by lazy {
         AnimatedItemStackRenderable(
             BOX_OF_SEEDS_ITEM.getItemStack(),
             rotation = ItemStackRotationDefinition(
                 axis = EnumFacing.Axis.Y,
-                rotationSpeed = 30.0
+                rotationSpeed = 65.0
             ),
             bounce = ItemStackBounceDefinition(
-                upwardBounce = 20,
-                downwardBounce = 20,
-                bounceSpeed = 4.0
-            )
+                upwardBounce = 25,
+                downwardBounce = 25,
+                bounceSpeed = 8.0
+            ),
+            scale = 4.0,
         )
     }
 
