@@ -19,7 +19,7 @@ object ItemRenderableTest {
     private val config get() = SkyHanniMod.feature.dev.debug
     private val BOX_OF_SEEDS_ITEM = "BOX_OF_SEEDS".toInternalName()
     private val itemStackRenderable by lazy {
-        ItemStackRenderable(BOX_OF_SEEDS_ITEM.getItemStack(), scale = 4.0)
+        ItemStackRenderable(BOX_OF_SEEDS_ITEM.getItemStack(), scale = 3.0)
     }
     private val animatedItemStackRenderable by lazy {
         AnimatedItemStackRenderable(
